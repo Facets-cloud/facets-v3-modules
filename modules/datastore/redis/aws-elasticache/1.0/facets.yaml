@@ -1,0 +1,210 @@
+intent: redis
+flavor: aws-elasticache
+version: '1.0'
+clouds:
+- aws
+description: Managed Redis cache using AWS ElastiCache with security and high availability
+  defaults
+intentDetails:
+  type: Datastores
+  description: AWS ElastiCache for Redis managed caching service
+  displayName: Redis
+  iconUrl: https://raw.githubusercontent.com/Facets-cloud/facets-modules-redesign/main/icons/redis.svg
+spec:
+  title: Redis AWS ElastiCache Cluster
+  description: Managed Redis cache using AWS ElastiCache with security and high availability
+    defaults
+  type: object
+  x-ui-order:
+  - version_config
+  - sizing
+  - restore_config
+  - imports
+  properties:
+    version_config:
+      type: object
+      title: Version & Basic Configuration
+      x-ui-order:
+      - redis_version
+      - node_type
+      properties:
+        redis_version:
+          type: string
+          title: Redis Version
+          description: Version of the Redis engine
+          enum:
+          - '7.0'
+          default: '7.0'
+        node_type:
+          type: string
+          title: Node Type
+          description: ElastiCache node type for Redis instances
+          enum:
+          - cache.t3.micro
+          - cache.t3.small
+          - cache.t3.medium
+          - cache.m6g.large
+          - cache.m6g.xlarge
+          default: cache.t3.small
+    sizing:
+      type: object
+      title: Sizing & Performance
+      x-ui-order:
+      - num_cache_nodes
+      - parameter_group_name
+      - snapshot_retention_limit
+      properties:
+        num_cache_nodes:
+          type: number
+          title: Number of Cache Nodes
+          description: Number of cache nodes in the cluster (use 2+ for high availability
+            with automatic failover)
+          minimum: 1
+          maximum: 6
+          default: 2
+        parameter_group_name:
+          type: string
+          title: Parameter Group
+          description: Name of the parameter group to associate with this cache cluster
+          default: default.redis7
+        snapshot_retention_limit:
+          type: number
+          title: Snapshot Retention (Days)
+          description: Number of days for which ElastiCache will retain automatic
+            cache cluster snapshots
+          minimum: 0
+          maximum: 35
+          default: 7
+    restore_config:
+      type: object
+      title: Restore Operations
+      x-ui-overrides-only: true
+      x-ui-order:
+      - restore_from_snapshot
+      - snapshot_name
+      - auth_token
+      properties:
+        restore_from_snapshot:
+          type: boolean
+          title: Restore from Snapshot
+          description: Restore cache cluster from existing snapshot
+          default: false
+        snapshot_name:
+          type: string
+          title: Snapshot Name
+          description: Name of the ElastiCache snapshot from which to restore
+          x-ui-visible-if:
+            field: spec.restore_config.restore_from_snapshot
+            values:
+            - true
+        auth_token:
+          type: string
+          title: Auth Token
+          description: Auth token for accessing the Redis cluster
+          minLength: 64
+          pattern: ^[a-zA-Z0-9!@#$%^&*()_+=\-]{64,}$
+          x-ui-error-message: "Auth token must be 64+ chars with valid characters."
+    imports:
+      type: object
+      title: Import Existing Resources
+      x-ui-overrides-only: true
+      x-ui-order:
+      - import_existing
+      - cluster_id
+      - subnet_group_name
+      - security_group_id
+      - auth_token
+      properties:
+        import_existing:
+          type: boolean
+          title: Import Existing Resources
+          description: Enable to import existing ElastiCache resources
+          default: false
+        cluster_id:
+          type: string
+          title: Cluster ID
+          description: ElastiCache cluster identifier for importing existing cluster
+          x-ui-visible-if:
+            field: spec.imports.import_existing
+            values:
+              - true
+        subnet_group_name:
+          type: string
+          title: Subnet Group Name
+          description: ElastiCache subnet group name for importing existing subnet
+            group
+          x-ui-visible-if:
+            field: spec.imports.import_existing
+            values:
+              - true
+        security_group_id:
+          type: string
+          title: Security Group ID
+          description: Security group ID for importing existing security group
+          x-ui-visible-if:
+            field: spec.imports.import_existing
+            values:
+              - true
+        auth_token:
+          type: string
+          title: Auth Token
+          description: Auth token for accessing the imported Redis cluster
+          minLength: 64
+          pattern: ^[a-zA-Z0-9!@#$%^&*()_+=\-]{64,}$
+          x-ui-error-message: "Auth token must be 64+ chars with valid characters."
+          x-ui-visible-if:
+            field: spec.imports.import_existing
+            values:
+              - true
+  required:
+  - version_config
+inputs:
+  aws_provider:
+    type: '@facets/aws_cloud_account'
+    optional: false
+    displayName: AWS Provider
+    description: AWS cloud account configuration
+    providers:
+    - aws
+  vpc_details:
+    type: '@facets/aws-vpc-details'
+    optional: false
+    displayName: VPC Details
+    description: AWS VPC configuration for ElastiCache deployment
+outputs:
+  default:
+    type: '@facets/redis'
+    title: Redis AWS ElastiCache Cluster
+imports:
+- name: cluster_id
+  resource_address: aws_elasticache_replication_group.redis
+  required: true
+- name: subnet_group_name
+  resource_address: aws_elasticache_subnet_group.redis
+  required: false
+- name: security_group_id
+  resource_address: aws_security_group.redis
+  required: false
+- name: auth_token
+  resource_address: random_password.redis_auth_token[0]
+  required: true
+iac:
+  validated_files:
+  - main.tf
+  - variables.tf
+  - locals.tf
+sample:
+  kind: redis
+  flavor: aws-elasticache
+  version: '1.0'
+  disabled: true
+  spec:
+    version_config:
+      redis_version: '7.0'
+      node_type: cache.t3.small
+    sizing:
+      num_cache_nodes: 2
+      parameter_group_name: default.redis7
+      snapshot_retention_limit: 7
+    restore_config:
+      restore_from_snapshot: false

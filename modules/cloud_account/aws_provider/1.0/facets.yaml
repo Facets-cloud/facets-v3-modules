@@ -1,0 +1,53 @@
+intent: cloud_account
+flavor: aws_provider
+version: '1.0'
+description: Configures AWS provider credentials for downstream modules
+intentDetails:
+  type: Cloud & Infrastructure
+  description: Configure AWS provider authentication - supports local CLI creds or cross-account assume-role
+  displayName: Cloud Account
+  iconUrl: https://raw.githubusercontent.com/Facets-cloud/facets-modules-redesign/main/icons/cloud_account.svg
+clouds:
+- aws
+spec:
+  title: AWS Cloud Account
+  description: Configure AWS provider authentication
+  type: object
+  properties:
+    region:
+      type: string
+      title: AWS Region
+      description: AWS region for this account
+    role_arn:
+      type: string
+      title: IAM Role ARN
+      description: ARN of IAM role to assume (leave empty to use local CLI credentials)
+    external_id:
+      type: string
+      title: External ID
+      description: External ID for cross-account assume-role trust policy (optional)
+  required:
+  - region
+  x-ui-order:
+  - region
+  - role_arn
+  - external_id
+outputs:
+  default:
+    type: '@facets/aws_cloud_account'
+    providers:
+      aws:
+        source: hashicorp/aws
+        version: = 6.9.0
+        attributes:
+          region: aws_region
+sample:
+  version: '1.0'
+  flavor: aws_provider
+  kind: cloud_account
+  disabled: false
+  spec:
+    region: us-east-1
+iac:
+  validated_files:
+  - variables.tf

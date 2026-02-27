@@ -1,0 +1,40 @@
+name: '@facets/kafka'
+properties:
+  type: object
+  properties:
+    attributes:
+      type: object
+      properties:
+        cluster_name:
+          type: string
+          description: Name of the Kafka cluster
+        kafka_version:
+          type: string
+          description: Apache Kafka version deployed
+        namespace:
+          type: string
+          description: Kubernetes namespace details for Kafka Topic and Kafka User resources
+    interfaces:
+      type: object
+      properties:
+        cluster:
+          type: object
+          properties:
+            connection_string:
+              type: string
+            endpoint:
+              type: string
+            endpoints:
+              type: object
+              additionalProperties:
+                type: string
+              description: Individual broker endpoints map
+            password:
+              type: string
+            secrets:
+              type: array
+              items:
+                type: string
+            username:
+              type: string
+providers: []

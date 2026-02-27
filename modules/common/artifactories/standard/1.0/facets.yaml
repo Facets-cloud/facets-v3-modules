@@ -1,0 +1,72 @@
+clouds:
+    - gcp
+    - kubernetes
+    - azure
+    - aws
+description: Adds artifactories - default flavor
+intentDetails:
+  type: Kubernetes Resources
+  description: Manages container registry secrets for pulling images from artifactories
+  displayName: Artifactories
+  iconUrl: https://raw.githubusercontent.com/Facets-cloud/facets-modules-redesign/main/icons/artifactories.svg
+flavor: standard
+inputs:
+    kubernetes_details:
+        displayName: Kubernetes Cluster
+        optional: false
+        providers:
+            - kubernetes
+            - kubernetes-alpha
+            - helm
+        type: '@facets/kubernetes-details'
+    kubernetes_node_pool_details:
+        displayName: Node Pool
+        optional: false
+        type: '@facets/kubernetes_nodepool'
+intent: artifactories
+outputs:
+    default:
+        title: Artifactories Details
+        type: '@facets/artifactories'
+sample:
+    disabled: true
+    flavor: standard
+    kind: artifactories
+    spec:
+        include_all: false
+    version: "1.0"
+spec:
+    description: Specification of the Artifactories resource intent
+    properties:
+        artifactories:
+            description: A map of Container Registries.
+            patternProperties:
+                ^[a-zA-Z0-9_.-]*$:
+                    description: The Name of the Container Registry for creating a secret.
+                    properties:
+                        name:
+                            description: Container Registry Name
+                            title: Name
+                            type: string
+                            x-ui-api-source:
+                                endpoint: /cc-ui/v1/artifactories
+                                labelKey: name
+                                method: GET
+                                params:
+                                    includeContent: false
+                                valueKey: name
+                    title: Artifactories Object Block
+                    type: object
+            title: Artifactories
+            type: object
+            x-ui-visible-if:
+                field: spec.include_all
+                values:
+                    - false
+        include_all:
+            description: Include all container registries mapped to this project.
+            title: Include All
+            type: boolean
+    title: Artifactories
+    type: object
+version: "1.0"

@@ -1,0 +1,48 @@
+name: '@facets/mysql'
+properties:
+  type: object
+  properties:
+    attributes:
+      type: object
+    interfaces:
+      type: object
+      properties:
+        reader:
+          type: object
+          properties:
+            connection_string:
+              type: string
+            database:
+              type: string
+            host:
+              type: string
+            password:
+              type: string
+            port:
+              type: number
+            secrets:
+              type: array
+              items:
+                type: string
+            username:
+              type: string
+        writer:
+          type: object
+          properties:
+            connection_string:
+              type: string
+            database:
+              type: string
+            host:
+              type: string
+            password:
+              type: string
+            port:
+              type: number
+            secrets:
+              type: array
+              items:
+                type: string
+            username:
+              type: string
+providers: []

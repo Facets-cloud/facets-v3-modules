@@ -1,0 +1,31 @@
+name: '@facets/redis'
+properties:
+  type: object
+  properties:
+    attributes:
+      type: object
+    interfaces:
+      type: object
+      properties:
+        cluster:
+          type: object
+          properties:
+            auth_token:
+              type: string
+            connection_string:
+              type: string
+            endpoint:
+              type: string
+            port:
+              type: string
+            secrets:
+              type: array
+              items:
+                type: string
+        writer:
+          description: Redis writer connection details
+          type: object
+        reader:
+          description: Redis reader connection details
+          type: object
+providers: []

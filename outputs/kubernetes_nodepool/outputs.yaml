@@ -1,0 +1,52 @@
+name: '@facets/kubernetes_nodepool'
+properties:
+  type: object
+  properties:
+    attributes:
+      type: object
+      properties:
+        node_class_name:
+          type: string
+          description: Name of the node class resource
+        node_pool_name:
+          type: string
+          description: Name of the node pool resource
+        taints:
+          type: array
+          items:
+            type: object
+            properties:
+              key:
+                type: string
+              value:
+                type: string
+              effect:
+                type: string
+          description: List of taints applied to the node pool
+        node_selector:
+          type: object
+          additionalProperties:
+            type: string
+          description: Map of labels used as node selector
+        node_pool_id:
+          description: Cloud-specific node pool identifier
+          type: string
+        topology_spread_key:
+          description: Topology key for pod spread constraints
+          type: string
+        service_account:
+          description: Service account used by nodes
+          type: string
+        disk_size_gb:
+          description: Node disk size in GB
+          type: number
+        node_count:
+          description: Number of nodes in the pool
+          type: number
+        node_fleet_details:
+          description: GCP node fleet details
+          type: object
+    interfaces:
+      type: object
+      properties: {}
+providers: []

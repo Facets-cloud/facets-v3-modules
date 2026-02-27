@@ -1,0 +1,181 @@
+name: '@facets/gcp-network-details'
+properties:
+  type: object
+  properties:
+    attributes:
+      type: object
+      properties:
+        database_subnet_cidrs:
+          description: List of database subnet CIDR blocks
+          type: array
+          items:
+            type: string
+        database_subnet_ids:
+          description: List of database subnet IDs
+          type: array
+          items:
+            type: string
+        firewall_rule_ids:
+          description: List of firewall rule IDs
+          type: array
+          items:
+            type: string
+        nat_gateway_ids:
+          description: List of Cloud NAT gateway IDs
+          type: array
+          items:
+            type: string
+        private_services_connection_id:
+          description: The ID of the service networking connection
+          type: string
+        private_services_connection_status:
+          description: Whether private services connection is enabled
+          type: boolean
+        private_services_peering_connection:
+          description: The network ID of the private services peering connection
+          type: string
+        private_services_range_address:
+          description: The actual IP address allocated for the private services range
+          type: string
+        private_services_range_id:
+          description: The ID of the global address resource for private services
+          type: string
+        private_services_range_name:
+          description: The name of the global address reserved for private services
+          type: string
+        private_subnet_cidrs:
+          description: List of private subnet CIDR blocks
+          type: array
+          items:
+            type: string
+        private_subnet_ids:
+          description: List of private subnet IDs
+          type: array
+          items:
+            type: string
+        project_id:
+          description: The GCP project ID
+          type: string
+        public_subnet_cidrs:
+          description: List of public subnet CIDR blocks
+          type: array
+          items:
+            type: string
+        public_subnet_ids:
+          description: List of public subnet IDs
+          type: array
+          items:
+            type: string
+        region:
+          description: The GCP region
+          type: string
+        router_ids:
+          description: List of Cloud Router IDs
+          type: array
+          items:
+            type: string
+        vpc_id:
+          description: The ID of the VPC
+          type: string
+        vpc_name:
+          description: The name of the VPC
+          type: string
+        vpc_self_link:
+          description: The URI of the VPC
+          type: string
+        zones:
+          description: List of zones used
+          type: array
+          items:
+            type: string
+        private_subnet_id:
+          description: Primary private subnet ID
+          type: string
+        private_subnet_name:
+          description: Primary private subnet name
+          type: string
+        private_subnet_cidr:
+          description: Primary private subnet CIDR
+          type: string
+        public_subnet_id:
+          description: Primary public subnet ID
+          type: string
+        public_subnet_name:
+          description: Primary public subnet name
+          type: string
+        public_subnet_cidr:
+          description: Primary public subnet CIDR
+          type: string
+        database_subnet_id:
+          description: Primary database subnet ID
+          type: string
+        database_subnet_name:
+          description: Primary database subnet name
+          type: string
+        database_subnet_cidr:
+          description: Primary database subnet CIDR
+          type: string
+        internal_lb_subnet_id:
+          description: Internal load balancer subnet ID
+          type: string
+        internal_lb_subnet_name:
+          description: Internal load balancer subnet name
+          type: string
+        internal_lb_subnet_cidr:
+          description: Internal load balancer subnet CIDR
+          type: string
+        gke_pods_range_name:
+          description: GKE pods secondary range name
+          type: string
+        gke_pods_cidr:
+          description: GKE pods CIDR range
+          type: string
+        gke_services_range_name:
+          description: GKE services secondary range name
+          type: string
+        gke_services_cidr:
+          description: GKE services CIDR range
+          type: string
+        router_id:
+          description: Cloud Router ID
+          type: string
+        router_name:
+          description: Cloud Router name
+          type: string
+        nat_id:
+          description: Cloud NAT ID
+          type: string
+        nat_name:
+          description: Cloud NAT name
+          type: string
+        google_services_network:
+          description: Google services peering network
+          type: string
+        google_services_cidr:
+          description: Google services CIDR range
+          type: string
+        network_tags:
+          description: Network tags applied to resources
+          type: object
+        total_private_ips:
+          description: Total private IPs allocated
+          type: number
+        total_public_ips:
+          description: Total public IPs allocated
+          type: number
+        total_database_ips:
+          description: Total database IPs allocated
+          type: number
+        total_gke_pod_ips:
+          description: Total GKE pod IPs allocated
+          type: number
+        total_gke_service_ips:
+          description: Total GKE service IPs allocated
+          type: number
+        reserved_ips:
+          description: Reserved IP addresses
+          type: object
+    interfaces:
+      type: object
+      properties: {}
+providers: []

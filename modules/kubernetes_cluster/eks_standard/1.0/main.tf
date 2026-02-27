@@ -1,0 +1,227 @@
+locals {
+  # Construct cluster name and ensure it doesn't exceed AWS limits
+  # IAM role name_prefix in terraform-aws-eks appends "-cluster-" (9 chars) to cluster_name
+  # Total limit is 38 chars, so cluster_name should be max 29 chars
+  full_cluster_name = "${var.instance_name}-${var.environment.unique_name}"
+  cluster_name      = length(local.full_cluster_name) > 29 ? substr(local.full_cluster_name, 0, 29) : local.full_cluster_name
+
+  # Merge environment cloud tags with cluster-specific tags
+  cluster_tags = merge(
+    var.environment.cloud_tags,
+    lookup(var.instance.spec, "cluster_tags", {}),
+    {
+      "facets:instance_name" = var.instance_name
+      "facets:environment"   = var.environment.name
+    }
+  )
+
+  # Default system node pool - always created for system workloads (CoreDNS, Karpenter, etc.)
+  # User can configure these values via spec.default_node_pool
+  default_system_node_group = {
+    system = {
+      name = "sys" # Short name to avoid IAM role name length limits
+
+      instance_types = lookup(lookup(var.instance.spec, "default_node_pool", {}), "instance_types", ["t3.medium"])
+      capacity_type  = lookup(lookup(var.instance.spec, "default_node_pool", {}), "capacity_type", "ON_DEMAND")
+
+      min_size     = lookup(lookup(var.instance.spec, "default_node_pool", {}), "size", 2)
+      max_size     = lookup(lookup(var.instance.spec, "default_node_pool", {}), "size", 2)
+      desired_size = lookup(lookup(var.instance.spec, "default_node_pool", {}), "size", 2)
+
+      disk_size = lookup(lookup(var.instance.spec, "default_node_pool", {}), "disk_size", 50)
+
+      labels = {
+        "workload-type" = "system"
+        "node-role"     = "system"
+      }
+
+      taints = []
+
+      # Use the private subnets from the network input
+      subnet_ids = var.inputs.network_details.attributes.private_subnet_ids
+
+      tags = merge(
+        local.cluster_tags,
+        {
+          "Name" = "${local.cluster_name}-system-node"
+        }
+      )
+    }
+  }
+
+  # Only the default system node group
+  eks_managed_node_groups = local.default_system_node_group
+
+  # Check if EBS CSI driver addon is enabled (default: true)
+  ebs_csi_enabled = lookup(lookup(var.instance.spec.cluster_addons, "ebs_csi", {}), "enabled", true)
+
+  # Build cluster addons configuration - default addons
+  default_addons = {
+    vpc-cni = lookup(var.instance.spec.cluster_addons.vpc_cni, "enabled", true) ? {
+      addon_version            = lookup(var.instance.spec.cluster_addons.vpc_cni, "version", "latest") == "latest" ? null : lookup(var.instance.spec.cluster_addons.vpc_cni, "version", null)
+      resolve_conflicts        = "OVERWRITE"
+      service_account_role_arn = null
+    } : null
+
+    kube-proxy = lookup(var.instance.spec.cluster_addons.kube_proxy, "enabled", true) ? {
+      addon_version            = lookup(var.instance.spec.cluster_addons.kube_proxy, "version", "latest") == "latest" ? null : lookup(var.instance.spec.cluster_addons.kube_proxy, "version", null)
+      resolve_conflicts        = "OVERWRITE"
+      service_account_role_arn = null
+    } : null
+
+    coredns = lookup(var.instance.spec.cluster_addons.coredns, "enabled", true) ? {
+      addon_version            = lookup(var.instance.spec.cluster_addons.coredns, "version", "latest") == "latest" ? null : lookup(var.instance.spec.cluster_addons.coredns, "version", null)
+      resolve_conflicts        = "OVERWRITE"
+      service_account_role_arn = null
+    } : null
+
+    aws-ebs-csi-driver = local.ebs_csi_enabled ? {
+      addon_version            = lookup(lookup(var.instance.spec.cluster_addons, "ebs_csi", {}), "version", "latest") == "latest" ? null : lookup(lookup(var.instance.spec.cluster_addons, "ebs_csi", {}), "version", null)
+      resolve_conflicts        = "OVERWRITE"
+      service_account_role_arn = aws_iam_role.ebs_csi_driver[0].arn
+    } : null
+
+    amazon-cloudwatch-observability = local.container_insights_enabled ? {
+      addon_version            = null
+      resolve_conflicts        = "OVERWRITE"
+      service_account_role_arn = null
+    } : null
+
+    metrics-server = lookup(lookup(var.instance.spec.cluster_addons, "metrics_server", {}), "enabled", true) ? {
+      addon_version            = lookup(lookup(var.instance.spec.cluster_addons, "metrics_server", {}), "version", "latest") == "latest" ? null : lookup(lookup(var.instance.spec.cluster_addons, "metrics_server", {}), "version", null)
+      resolve_conflicts        = "OVERWRITE"
+      service_account_role_arn = null
+    } : null
+  }
+
+  # Build additional/custom addons configuration
+  additional_addons = {
+    for addon_name, addon_config in lookup(var.instance.spec.cluster_addons, "additional_addons", {}) :
+    addon_name => lookup(addon_config, "enabled", true) ? {
+      addon_version            = lookup(addon_config, "version", "latest") == "latest" ? null : lookup(addon_config, "version", null)
+      resolve_conflicts        = "OVERWRITE"
+      configuration_values     = lookup(addon_config, "configuration_values", null)
+      service_account_role_arn = lookup(addon_config, "service_account_role_arn", null)
+    } : null
+  }
+
+  # Merge default and additional addons
+  cluster_addons_config = merge(
+    local.default_addons,
+    local.additional_addons
+  )
+
+  # Filter out disabled addons
+  enabled_cluster_addons = {
+    for addon_name, addon_config in local.cluster_addons_config :
+    addon_name => addon_config if addon_config != null
+  }
+
+  # Container Insights
+  container_insights_enabled  = lookup(var.instance.spec, "container_insights_enabled", false)
+  needs_cloudwatch_iam_policy = contains(keys(local.enabled_cluster_addons), "amazon-cloudwatch-observability")
+
+  # KMS key for secrets encryption (only if enabled)
+  enable_kms_key = lookup(var.instance.spec, "customer_managed_kms", true)
+}
+
+# EKS Cluster using the official terraform-aws-eks module
+module "eks" {
+  source = "./aws-terraform-eks"
+
+  cluster_name    = local.cluster_name
+  cluster_version = var.instance.spec.cluster_version
+
+  # Network configuration
+  vpc_id = var.inputs.network_details.attributes.vpc_id
+  subnet_ids = concat(
+    var.inputs.network_details.attributes.private_subnet_ids,
+    lookup(var.inputs.network_details.attributes, "public_subnet_ids", [])
+  )
+
+  # Cluster endpoint access
+  cluster_endpoint_public_access  = lookup(var.instance.spec, "cluster_endpoint_public_access", true)
+  cluster_endpoint_private_access = lookup(var.instance.spec, "cluster_endpoint_private_access", true)
+
+  # Control plane logging - all 5 log types enabled by default, user-configurable
+  cluster_enabled_log_types = lookup(var.instance.spec, "enabled_log_types", ["api", "audit", "authenticator", "controllerManager", "scheduler"])
+
+  # Secrets encryption - let the submodule manage its own KMS key
+  create_kms_key = local.enable_kms_key
+  cluster_encryption_config = jsondecode(
+    local.enable_kms_key ? jsonencode({ resources = ["secrets"] }) : jsonencode({})
+  )
+
+  # Managed node groups
+  eks_managed_node_groups = local.eks_managed_node_groups
+
+  # Allow control plane to reach metrics-server on port 10251 (API aggregation)
+  node_security_group_additional_rules = {
+    ingress_cluster_10251_metrics_server = {
+      description                   = "Cluster API to metrics-server"
+      protocol                      = "tcp"
+      from_port                     = 10251
+      to_port                       = 10251
+      type                          = "ingress"
+      source_cluster_security_group = true
+    }
+  }
+
+  # Cluster addons
+  cluster_addons = local.enabled_cluster_addons
+
+  # IMPORTANT: Explicitly disable EKS Auto Mode since this is eks_standard flavor
+  # EKS Auto Mode is NOT supported in this module variant
+  # For Auto Mode support, use the eks_auto flavor instead
+  enable_cluster_creator_admin_permissions = true
+
+  tags = local.cluster_tags
+}
+
+# Data source to get cluster authentication token
+data "aws_eks_cluster_auth" "cluster" {
+  name = module.eks.cluster_name
+}
+
+# IAM Role for EBS CSI Driver (IRSA)
+resource "aws_iam_role" "ebs_csi_driver" {
+  count = local.ebs_csi_enabled ? 1 : 0
+
+  name = "${local.cluster_name}-ebs-csi-driver"
+
+  assume_role_policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Effect = "Allow"
+        Principal = {
+          Federated = module.eks.oidc_provider_arn
+        }
+        Action = "sts:AssumeRoleWithWebIdentity"
+        Condition = {
+          StringEquals = {
+            "${module.eks.oidc_provider}:aud" = "sts.amazonaws.com"
+            "${module.eks.oidc_provider}:sub" = "system:serviceaccount:kube-system:ebs-csi-controller-sa"
+          }
+        }
+      }
+    ]
+  })
+
+  tags = local.cluster_tags
+}
+
+resource "aws_iam_role_policy_attachment" "ebs_csi_driver" {
+  count = local.ebs_csi_enabled ? 1 : 0
+
+  role       = aws_iam_role.ebs_csi_driver[0].name
+  policy_arn = "arn:aws:iam::aws:policy/service-role/AmazonEBSCSIDriverPolicy"
+}
+
+# CloudWatch Agent policy for node groups (when Container Insights is enabled)
+resource "aws_iam_role_policy_attachment" "cloudwatch_agent" {
+  for_each = local.needs_cloudwatch_iam_policy ? module.eks.eks_managed_node_groups : {}
+
+  role       = each.value.iam_role_name
+  policy_arn = "arn:aws:iam::aws:policy/CloudWatchAgentServerPolicy"
+}

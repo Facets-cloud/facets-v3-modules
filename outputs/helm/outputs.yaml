@@ -1,0 +1,25 @@
+name: '@facets/helm'
+properties:
+  type: object
+  properties:
+    attributes:
+      type: object
+      properties:
+        release_name:
+          type: string
+        release_namespace:
+          description: Kubernetes namespace of the Helm release
+          type: string
+        chart_version:
+          description: Version of the deployed Helm chart
+          type: string
+        helm_release_id:
+          description: Unique identifier for the Helm release
+          type: string
+        values:
+          description: Rendered Helm values
+          type: object
+    interfaces:
+      type: object
+      properties: {}
+providers: []
