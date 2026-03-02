@@ -19,7 +19,9 @@ properties:
           type: string
         secrets:
           description: Sensitive credentials and secrets
-          type: object
+          type: array
+          items:
+            type: string
     interfaces:
       type: object
       properties: {}

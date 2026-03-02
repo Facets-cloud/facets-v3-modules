@@ -25,11 +25,9 @@ variable "instance_name" {
 variable "inputs" {
   type = object({
     kubernetes_details = object({
-      attributes = object({
-        cluster_endpoint       = string
-        cluster_ca_certificate = string
-        token                  = optional(string)
-      })
+      attributes = optional(object({
+        cluster_endpoint = optional(string)
+      }))
     })
     kubernetes_node_pool_details = optional(object({
       node_selector = optional(map(string))
@@ -43,9 +41,7 @@ variable "inputs" {
   default = {
     kubernetes_details = {
       attributes = {
-        cluster_endpoint       = ""
-        cluster_ca_certificate = ""
-        token                  = ""
+        cluster_endpoint = ""
       }
     }
     kubernetes_node_pool_details = {}
