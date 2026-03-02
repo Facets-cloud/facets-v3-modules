@@ -43,6 +43,13 @@ inputs:
       resource_name: default
     displayName: Certificate Manager
     description: Certificate Manager configuration for TLS certificate management
+  cloud_account:
+    type: '@facets/aws_cloud_account'
+    optional: true
+    displayName: Cloud Account
+    description: AWS account for Route53 DNS management (required only if base_domain is set)
+    providers:
+    - aws
 spec:
   title: Nginx Ingress Controller
   type: object
@@ -60,6 +67,10 @@ spec:
       title: Disable Base Domain
       description: Disable automatic creation of base domain for this ingress
       default: false
+    base_domain:
+      type: string
+      title: Base Domain
+      description: Root domain for ingress DNS records (e.g., example.com). A matching Route53 hosted zone must exist in your AWS account. Leave empty to skip DNS record creation.
     resources:
       type: object
       title: Controller Resources

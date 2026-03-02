@@ -1,5 +1,5 @@
 locals {
-  tenant_provider  = lower(local.cc_tenant_provider != "" ? local.cc_tenant_provider : "aws")
+  tenant_provider  = lower(try(var.inputs.kubernetes_details.attributes.cloud_provider, "aws"))
   base_helm_values = lookup(var.instance.spec, "helm_values", {})
 
   # Load balancer configuration - determine record type based on what's actually available
@@ -1190,7 +1190,6 @@ resource "aws_route53_record" "cluster-base-domain" {
   type    = local.record_type
   ttl     = "300"
   records = [local.lb_record_value]
-  # provider = "aws3tooling"
   lifecycle {
     prevent_destroy = true
   }
@@ -1207,7 +1206,6 @@ resource "aws_route53_record" "cluster-base-domain-wildcard" {
   type    = local.record_type
   ttl     = "300"
   records = [local.lb_record_value]
-  # provider = "aws3tooling"
   lifecycle {
     prevent_destroy = true
   }

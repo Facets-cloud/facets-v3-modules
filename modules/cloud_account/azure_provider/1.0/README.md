@@ -2,27 +2,44 @@
 
 ## Overview
 
-The Azure Cloud Account module configures and provisions resources within an Azure cloud account. This module establishes the foundational connection to Azure services, enabling secure access and resource management across your infrastructure. It provides essential cloud account configuration including subscription management, service principal authentication, and provider setup for both Azure Resource Manager and Azure API providers.
+Configures Azure provider credentials for downstream modules. Supports progressive authentication: use `az login` defaults for local development (Level 0) or provide explicit service principal credentials for CI/production (Level 1).
+
+## Authentication Levels
+
+### Level 0: az login (zero config)
+
+Run `az login` locally. The module passes `subscription_id` and leaves other fields empty, so the Azure provider falls back to CLI-based authentication.
+
+### Level 1: Service Principal
+
+Provide `client_id`, `client_secret`, and `tenant_id` in the resource spec for explicit service principal authentication. Use `raptor2 create secret` for production secrets.
 
 ## Configurability
 
-- **Cloud Account Selection**: Choose from previously linked Azure cloud accounts with automatic validation and filtering by provider type.
-- **Multi-Provider Support**: Configure both Azure Resource Manager (azurerm) and Azure API (azapi) providers for comprehensive Azure service access.
-- **Service Principal Authentication**: Secure Azure provider configuration with client ID, client secret, tenant ID, and subscription ID management.
-- **Provider Version Management**: Automatic provider version management with Azure Resource Manager 4.36.0 and Azure API 2.5.0.
-- **Validation & UI Enhancements**:
-  - Cloud account filtering by provider type (Azure only)
-  - Integrated validation for Azure service principal credentials
-  - Dynamic account selection with real-time validation
+- **subscription_id** (required): Azure subscription ID
+- **tenant_id** (optional): Azure AD tenant ID
+- **client_id** (optional): Service principal application/client ID
+- **client_secret** (optional): Service principal secret
 
 ## Usage
 
-This module is designed as the foundational component for all Azure-based infrastructure deployments.
+```yaml
+kind: cloud_account
+flavor: azure_provider
+version: "1.0"
+spec:
+  subscription_id: "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx"
+```
 
-Common use cases:
+For service principal authentication:
 
-- Establishing secure Azure cloud account connections for infrastructure provisioning
-- Configuring multi-subscription access patterns for enterprise Azure environments
-- Setting up service principal authentication for automated resource management
-- Enabling secure provider authentication for Terraform-based Azure resource management
-- Supporting enterprise-grade Azure access control and compliance requirements
+```yaml
+kind: cloud_account
+flavor: azure_provider
+version: "1.0"
+spec:
+  subscription_id: "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx"
+  tenant_id: "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx"
+  client_id: "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx"
+  client_secret: "${secret:azure_client_secret}"
+```

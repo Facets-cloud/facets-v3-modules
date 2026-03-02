@@ -1,12 +1,7 @@
-# Fetch Route53 zone by domain name
-data "aws_route53_zone" "base-domain-zone" {
-  count    = lower(local.cc_tenant_provider != "" ? local.cc_tenant_provider : "aws") == "aws" ? 1 : 0
-  name     = local.tenant_base_domain
-  provider = "aws3tooling"
-}
+# Route53 data source moved to data.tf
 
 locals {
-  tenant_provider = lower(local.cc_tenant_provider != "" ? local.cc_tenant_provider : "aws")
+  tenant_provider = lower(try(var.inputs.kubernetes_details.cloud_provider, try(var.inputs.kubernetes_details.attributes.cloud_provider, "aws")))
   advanced_config = lookup(lookup(var.instance, "advanced", {}), "nginx_ingress_controller", {})
   # Get user supplied helm values and merge with PDB configuration
   base_helm_values = lookup(local.advanced_config, "values", {})
@@ -482,7 +477,6 @@ resource "aws_route53_record" "cluster-base-domain" {
   records = [
     local.record_type == "CNAME" ? data.kubernetes_service.nginx-ingress-ctlr.status.0.load_balancer.0.ingress.0.hostname : data.kubernetes_service.nginx-ingress-ctlr.status.0.load_balancer.0.ingress.0.ip
   ]
-  provider = "aws3tooling"
   lifecycle {
     prevent_destroy = true
   }
@@ -499,7 +493,6 @@ resource "aws_route53_record" "cluster-base-domain-wildcard" {
   records = [
     local.record_type == "CNAME" ? data.kubernetes_service.nginx-ingress-ctlr.status.0.load_balancer.0.ingress.0.hostname : data.kubernetes_service.nginx-ingress-ctlr.status.0.load_balancer.0.ingress.0.ip
   ]
-  provider = "aws3tooling"
   lifecycle {
     prevent_destroy = true
   }

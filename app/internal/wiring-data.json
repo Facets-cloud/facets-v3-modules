@@ -1525,83 +1525,6 @@
       }
     },
     {
-      "id": "kubernetes_cluster/eks_automode/1.0",
-      "intent": "kubernetes_cluster",
-      "flavor": "eks_automode",
-      "version": "1.0",
-      "clouds": [
-        "aws"
-      ],
-      "outputs": {
-        "default": {
-          "type": "@facets/kubernetes-details",
-          "hasProviders": true,
-          "providers": [
-            "kubernetes",
-            "helm",
-            "kubernetes-alpha"
-          ]
-        },
-        "attributes": {
-          "type": "@facets/eks",
-          "hasProviders": false,
-          "providers": []
-        }
-      },
-      "inputs": {
-        "network_details": {
-          "type": "@facets/aws-vpc-details",
-          "optional": false,
-          "default": {
-            "resource_type": "network",
-            "resource_name": "default"
-          },
-          "providers": [],
-          "attributesUsed": [
-            "private_subnet_ids",
-            "vpc_cidr_block",
-            "vpc_id"
-          ],
-          "interfacesUsed": []
-        },
-        "cloud_account": {
-          "type": "@facets/aws_cloud_account",
-          "optional": false,
-          "default": null,
-          "providers": [
-            "aws"
-          ],
-          "attributesUsed": [
-            "aws_iam_role",
-            "aws_region",
-            "external_id"
-          ],
-          "interfacesUsed": []
-        }
-      },
-      "outputAttributes": {
-        "cluster_endpoint": "module.eks.cluster_endpoint",
-        "cluster_ca_certificate": "base64decode(module.eks.cluster_certificate_authority_data)",
-        "cluster_name": "module.eks.cluster_name",
-        "cluster_location": "local.cluster_location",
-        "cluster_version": "module.eks.cluster_version",
-        "cluster_arn": "module.eks.cluster_arn",
-        "cluster_id": "module.eks.cluster_id",
-        "oidc_issuer_url": "module.eks.cluster_oidc_issuer_url",
-        "oidc_provider": "module.eks.oidc_provider",
-        "oidc_provider_arn": "module.eks.oidc_provider_arn",
-        "node_iam_role_arn": "module.eks.node_iam_role_arn",
-        "node_iam_role_name": "module.eks.node_iam_role_name",
-        "node_security_group_id": "module.eks.node_security_group_id",
-        "cloud_provider": "\"AWS\"",
-        "kubernetes_provider_exec": [],
-        "secrets": "[\"cluster_ca_certificate\", \"kubernetes_provider_exec\"]"
-      },
-      "outputInterfaces": {
-        "kubernetes": []
-      }
-    },
-    {
       "id": "kubernetes_cluster/eks_standard/1.0",
       "intent": "kubernetes_cluster",
       "flavor": "eks_standard",
@@ -1833,69 +1756,6 @@
         "node_count": "azurerm_kubernetes_cluster_node_pool.node_pool.node_count",
         "taints": "local.node_taints",
         "node_selector": "local.node_labels"
-      },
-      "outputInterfaces": {}
-    },
-    {
-      "id": "kubernetes_node_pool/eks_automode/1.0",
-      "intent": "kubernetes_node_pool",
-      "flavor": "eks_automode",
-      "version": "1.0",
-      "clouds": [
-        "aws"
-      ],
-      "outputs": {
-        "default": {
-          "type": "@facets/kubernetes_nodepool",
-          "hasProviders": false,
-          "providers": []
-        },
-        "attributes": {
-          "type": "@facets/aws_karpenter_nodepool",
-          "hasProviders": false,
-          "providers": []
-        }
-      },
-      "inputs": {
-        "kubernetes_details": {
-          "type": "@facets/eks",
-          "optional": false,
-          "default": null,
-          "providers": [
-            "helm",
-            "kubernetes",
-            "kubernetes-alpha"
-          ],
-          "attributesUsed": [],
-          "interfacesUsed": []
-        },
-        "network_details": {
-          "type": "@facets/aws-vpc-details",
-          "optional": false,
-          "default": null,
-          "providers": [],
-          "attributesUsed": [
-            "availability_zones",
-            "internet_gateway_id",
-            "nat_gateway_ids",
-            "private_subnet_ids",
-            "public_subnet_ids",
-            "vpc_cidr_block",
-            "vpc_endpoint_dynamodb_id",
-            "vpc_endpoint_ecr_api_id",
-            "vpc_endpoint_ecr_dkr_id",
-            "vpc_endpoint_s3_id",
-            "vpc_endpoints_security_group_id",
-            "vpc_id"
-          ],
-          "interfacesUsed": []
-        }
-      },
-      "outputAttributes": {
-        "node_class_name": "local.node_class_name",
-        "node_pool_name": "local.node_pool_name",
-        "taints": "local.taints",
-        "node_selector": "local.labels"
       },
       "outputInterfaces": {}
     },
@@ -2371,11 +2231,6 @@
       "outputs": {
         "default": {
           "type": "@facets/mongo",
-          "hasProviders": false,
-          "providers": []
-        },
-        "attributes": {
-          "type": "@facets/mongo_k8s",
           "hasProviders": false,
           "providers": []
         }

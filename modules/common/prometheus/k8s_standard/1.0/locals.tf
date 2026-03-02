@@ -96,19 +96,23 @@ locals {
   # Facets default receiver with platform webhooks - MUST ALWAYS BE PRESENT
   facets_default_receiver = {
     name = "default"
-    webhook_configs = [
-      {
-        url           = "http://alertmanager-webhook.default/alerts"
-        send_resolved = true
-      },
-      {
-        url           = "https://${local.cc_host}/cc/v1/clusters/${var.environment.environment_id}/alerts"
-        send_resolved = true
-        http_config = {
-          bearer_token = local.cc_auth_token
+    webhook_configs = concat(
+      [
+        {
+          url           = "http://alertmanager-webhook.default/alerts"
+          send_resolved = true
         }
-      }
-    ]
+      ],
+      lookup(local.spec, "alertmanager_webhook_url", "") != "" ? [
+        {
+          url           = local.spec.alertmanager_webhook_url
+          send_resolved = true
+          http_config = {
+            bearer_token = lookup(local.spec, "alertmanager_webhook_token", "")
+          }
+        }
+      ] : []
+    )
   }
 
   # Concatenate user receivers (if any) with Facets default receiver
@@ -312,14 +316,14 @@ locals {
           cookie_secure   = true
           cookie_samesite = "none"
         }
-        server = {
-          domain              = local.cc_host
+        server = lookup(local.spec, "grafana_domain", "") != "" ? {
+          domain              = local.spec.grafana_domain
           root_url            = "%(protocol)s://%(domain)s:%(http_port)s/tunnel/${var.environment.environment_id}/grafana/"
           serve_from_sub_path = true
-        }
-        live = {
-          allowed_origins = "https://${local.cc_host}"
-        }
+        } : {}
+        live = lookup(local.spec, "grafana_domain", "") != "" ? {
+          allowed_origins = "https://${local.spec.grafana_domain}"
+        } : {}
         "auth.anonymous" = {
           enabled  = true
           org_name = "Main Org."

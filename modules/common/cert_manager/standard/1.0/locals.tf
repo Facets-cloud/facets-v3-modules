@@ -1,6 +1,5 @@
 # Define your locals here
 locals {
-  tenant_provider           = lower(local.cc_tenant_provider != "" ? local.cc_tenant_provider : "aws")
   spec                      = lookup(var.instance, "spec", {})
   user_supplied_helm_values = try(local.spec.cert_manager.values, {})
   cert_manager              = lookup(local.spec, "cert_manager", {})

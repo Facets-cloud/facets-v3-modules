@@ -1,48 +1,37 @@
 intent: cloud_account
 flavor: azure_provider
-lifecycle: ENVIRONMENT
 version: '1.0'
-depends_on: []
-input_type: instance
-description: Module to configure and provision resources within a cloud account
+description: Configures Azure provider credentials for downstream modules
 intentDetails:
   type: Cloud & Infrastructure
-  description: Configure and provision resources within an Azure cloud account
+  description: Configure Azure provider authentication - supports az login defaults or service principal credentials
   displayName: Cloud Account
   iconUrl: https://raw.githubusercontent.com/Facets-cloud/facets-modules-redesign/main/icons/cloud_account.svg
-composition: {}
-conditional_on_intent: ''
 clouds:
 - azure
 spec:
-  description: Module to configure and provision resources within a cloud account
-  properties:
-    cloud_account:
-      description: Select the cloud account to use (must be previously linked)
-      title: Cloud Account
-      type: string
-      x-ui-typeable: true
-      x-ui-overrides-only: true
-      x-ui-show-label-selected: true
-      x-ui-api-source:
-        endpoint: /cc-ui/v1/accounts/
-        method: GET
-        labelKey: name
-        valueKey: id
-        filterConditions:
-        - field: accountType
-          value: CLOUD
-        - field: provider
-          value: AZURE
-        params:
-          includeContent: false
-  required:
-  - cloud_account
-  title: Cloud Account Manager
+  title: Azure Cloud Account
+  description: Configure Azure provider credentials. Uses az login defaults if service principal fields are omitted.
   type: object
-  x-ui-order:
-  - cloud_provider
-  - cloud_account
+  properties:
+    subscription_id:
+      type: string
+      title: Subscription ID
+      description: Azure subscription ID
+    tenant_id:
+      type: string
+      title: Tenant ID
+      description: Azure AD tenant ID (optional if using az login)
+    client_id:
+      type: string
+      title: Client ID
+      description: Service principal application/client ID (optional if using az login)
+    client_secret:
+      type: string
+      title: Client Secret
+      description: Service principal secret (optional if using az login, use raptor2 secrets for production)
+  required:
+  - subscription_id
 outputs:
   default:
     type: '@facets/azure_cloud_account'
@@ -70,7 +59,7 @@ sample:
   kind: cloud_account
   disabled: false
   spec:
-    cloud_account: ""
+    subscription_id: ""
 iac:
   validated_files:
   - variables.tf

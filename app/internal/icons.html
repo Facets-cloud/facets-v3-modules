@@ -119,7 +119,6 @@
             intent: "kubernetes_cluster", displayName: "Kubernetes Cluster", type: "Cloud & Infrastructure", icon: "kubernetes_cluster.svg",
             flavors: [
               { flavor: "eks_standard", clouds: ["aws"] },
-              { flavor: "eks_automode", clouds: ["aws"] },
               { flavor: "gke", clouds: ["gcp"] },
               { flavor: "aks", clouds: ["azure"] },
             ]
@@ -128,7 +127,6 @@
             intent: "kubernetes_node_pool", displayName: "Kubernetes Node Pool", type: "Cloud & Infrastructure", icon: "kubernetes_node_pool.svg",
             flavors: [
               { flavor: "karpenter", clouds: ["aws"] },
-              { flavor: "eks_automode", clouds: ["aws"] },
               { flavor: "gcp", clouds: ["gcp"] },
               { flavor: "gcp_node_fleet", clouds: ["gcp"] },
               { flavor: "azure", clouds: ["azure"] },

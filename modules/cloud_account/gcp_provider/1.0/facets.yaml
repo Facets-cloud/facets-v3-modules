@@ -1,55 +1,37 @@
 intent: cloud_account
 flavor: gcp_provider
 version: '1.0'
-description: Module to configure and provision resources within a cloud account
+description: Configures GCP provider credentials for downstream modules
 intentDetails:
   type: Cloud & Infrastructure
-  description: Configure and provision resources within a GCP cloud account
+  description: Configure GCP provider authentication - supports gcloud CLI auth, service account key file, or inline JSON credentials
   displayName: Cloud Account
   iconUrl: https://raw.githubusercontent.com/Facets-cloud/facets-modules-redesign/main/icons/cloud_account.svg
 clouds:
 - gcp
 spec:
-  description: Module to configure and provision resources within a cloud account
-    (AWS, GCP, Azure)
+  title: GCP Cloud Account
+  description: Configure GCP provider credentials. Uses gcloud auth application-default login if credentials fields are omitted.
+  type: object
   properties:
+    project:
+      type: string
+      title: Project ID
+      description: GCP project ID
     region:
       type: string
-      title: GCP Region
-      description: GCP region where resources will be created
-      x-ui-overrides-only: true
-      x-ui-api-source:
-        endpoint: /cc-ui/v1/dropdown/gcp/regions-v2
-        method: GET
-        labelKey: region
-        valueKey: region
-        path: regions
-    cloud_account:
-      description: Select the cloud account to use (must be previously linked)
-      title: Cloud Account
+      title: Region
+      description: GCP region for resource deployment
+    credentials_file:
       type: string
-      x-ui-typeable: true
-      x-ui-overrides-only: true
-      x-ui-show-label-selected: true
-      x-ui-api-source:
-        endpoint: /cc-ui/v1/accounts/
-        method: GET
-        labelKey: name
-        valueKey: id
-        filterConditions:
-        - field: accountType
-          value: CLOUD
-        - field: provider
-          value: GCP
-        params:
-          includeContent: false
+      title: Credentials File
+      description: Path to service account JSON key file (optional if using gcloud auth application-default login)
+    credentials_json:
+      type: string
+      title: Credentials JSON
+      description: Inline service account JSON key (optional, prefer credentials_file or gcloud auth. Use raptor2 secrets for production)
   required:
-  - cloud_account
-  - region
-  title: Cloud Account Manager
-  type: object
-  x-ui-order:
-  - cloud_account
+  - project
   - region
 outputs:
   default:
@@ -73,7 +55,7 @@ sample:
   kind: cloud_account
   disabled: false
   spec:
-    cloud_account: ""
+    project: ""
     region: ""
 iac:
   validated_files:

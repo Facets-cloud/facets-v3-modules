@@ -58,6 +58,13 @@ inputs:
     default:
       resource_type: prometheus
       resource_name: default
+  cloud_account:
+    type: '@facets/aws_cloud_account'
+    optional: true
+    displayName: Cloud Account
+    description: AWS account for Route53 DNS management (required only if base_domain is set)
+    providers:
+      - aws
 spec:
   title: NGINX Gateway Fabric
   type: object
@@ -71,6 +78,10 @@ spec:
       title: Disable Base Domain
       description: Disable automatic creation of base domain for this gateway
       default: false
+    base_domain:
+      type: string
+      title: Base Domain
+      description: Root domain for gateway DNS records (e.g., example.com). A matching Route53 hosted zone must exist in your AWS account. Leave empty to skip DNS record creation.
     domains:
       title: Domains
       description: Map of domain key to rules

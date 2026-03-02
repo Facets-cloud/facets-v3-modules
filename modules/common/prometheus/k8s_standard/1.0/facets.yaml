@@ -85,6 +85,20 @@ spec:
       description: Pod tolerations for Prometheus components in YAML format
       default: '[]'
       x-ui-yaml-editor: true
+    alertmanager_webhook_url:
+      type: string
+      title: External Webhook URL
+      description: External webhook URL for alert forwarding (optional, for enterprise
+        server integration)
+    alertmanager_webhook_token:
+      type: string
+      title: Webhook Auth Token
+      description: Bearer token for webhook authentication (optional)
+    grafana_domain:
+      type: string
+      title: Grafana Domain
+      description: Domain for Grafana server configuration and CORS allowed origins
+        (optional, for enterprise server integration)
     enable_crds:
       type: boolean
       title: Install CRDs
