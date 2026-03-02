@@ -1,0 +1,10 @@
+name: '@facets/secret_store'
+properties:
+  type: object
+  properties:
+    attributes:
+      type: object
+      additionalProperties: true
+    interfaces:
+      type: object
+providers: []
