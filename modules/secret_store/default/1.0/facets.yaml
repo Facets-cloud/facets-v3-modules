@@ -1,0 +1,25 @@
+intent: secret_store
+flavor: default
+version: '1.0'
+description: Passthrough module for project secrets and shared configuration
+clouds:
+- aws
+- gcp
+- azure
+spec:
+  title: Secret Store
+  description: Key-value pairs (use !secret tag for encrypted values)
+  type: object
+  additionalProperties: true
+outputs:
+  default:
+    type: '@facets/secret_store'
+    title: Secret Store Output
+sample:
+  version: '1.0'
+  flavor: default
+  kind: secret_store
+  disabled: false
+  spec:
+    db_password: changeme
+    api_key: changeme
