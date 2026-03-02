@@ -10,9 +10,22 @@ properties:
         node_pool_name:
           type: string
         taints:
-          type: string
+          type: array
+          items:
+            type: object
+            properties:
+              key:
+                type: string
+              value:
+                type: string
+              effect:
+                type: string
+          description: List of taints applied to the node pool
         node_selector:
-          type: string
+          type: object
+          additionalProperties:
+            type: string
+          description: Map of labels used as node selector
     interfaces:
       type: object
       properties: {}
