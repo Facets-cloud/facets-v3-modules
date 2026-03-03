@@ -24,11 +24,11 @@ locals {
   replica_identifier_base = local.is_db_instance_import ? substr("${local.base_cleaned}imp", 0, 47) : substr(local.db_identifier, 0, 52)
 
   # Database configuration
-  is_restore_operation = var.instance.spec.restore_config.restore_from_backup
+  is_restore_operation = try(var.instance.spec.restore_config.restore_from_backup, false)
 
   # When importing, username and password should be same as the original to avoid overriding existing values
-  master_username = local.is_restore_operation ? var.instance.spec.restore_config.restore_master_username : "admin"
-  master_password = local.is_restore_operation ? var.instance.spec.restore_config.restore_master_password : random_password.master_password[0].result
+  master_username = local.is_restore_operation ? try(var.instance.spec.restore_config.restore_master_username, "admin") : "admin"
+  master_password = local.is_restore_operation ? try(var.instance.spec.restore_config.restore_master_password, null) : try(random_password.master_password[0].result, null)
 
   # Database name - should be same when importing
   database_name = var.instance.spec.version_config.database_name

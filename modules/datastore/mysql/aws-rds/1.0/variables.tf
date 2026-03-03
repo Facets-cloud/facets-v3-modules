@@ -8,7 +8,7 @@ variable "instance" {
       version_config = object({
         version         = string
         database_name   = string
-        master_username = string
+        master_username = optional(string, "admin")
       })
       sizing = object({
         instance_class        = string
@@ -17,12 +17,12 @@ variable "instance" {
         storage_type          = string
         read_replica_count    = number
       })
-      restore_config = object({
+      restore_config = optional(object({
         restore_from_backup           = bool
         source_db_instance_identifier = optional(string)
         restore_master_username       = optional(string)
         restore_master_password       = optional(string)
-      })
+      }))
       imports = optional(object({
         import_existing        = optional(bool, false)
         db_instance_identifier = optional(string)

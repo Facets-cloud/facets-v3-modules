@@ -1,7 +1,7 @@
 # PostgreSQL RDS Instance Implementation
 
 resource "random_password" "master_password" {
-  count   = var.instance.spec.restore_config.restore_from_backup ? 0 : 1
+  count   = try(var.instance.spec.restore_config.restore_from_backup, false) ? 0 : 1
   length  = 16
   special = true
   upper   = true
@@ -56,8 +56,9 @@ locals {
   replica_identifier_base = local.is_importing ? substr("${local.base_cleaned}imp", 0, 47) : substr(local.db_instance_identifier, 0, 52)
 
   # Master credentials
-  master_username = var.instance.spec.restore_config.restore_from_backup ? var.instance.spec.restore_config.master_username : "pgadmin"
-  master_password = var.instance.spec.restore_config.restore_from_backup ? var.instance.spec.restore_config.master_password : random_password.master_password[0].result
+  is_restore_operation = try(var.instance.spec.restore_config.restore_from_backup, false)
+  master_username      = local.is_restore_operation ? try(var.instance.spec.restore_config.master_username, "pgadmin") : "pgadmin"
+  master_password      = local.is_restore_operation ? try(var.instance.spec.restore_config.master_password, null) : try(random_password.master_password[0].result, null)
 
   # Database configuration
   database_name = var.instance.spec.version_config.database_name
@@ -178,7 +179,7 @@ resource "aws_db_instance" "postgres" {
   performance_insights_enabled = true
 
   # Snapshot identifier for restore (conditional)
-  snapshot_identifier = var.instance.spec.restore_config.restore_from_backup ? var.instance.spec.restore_config.source_db_instance_identifier : null
+  snapshot_identifier = local.is_restore_operation ? try(var.instance.spec.restore_config.source_db_instance_identifier, null) : null
 
   # Parameter group (use default for now)
   parameter_group_name = "default.postgres${split(".", var.instance.spec.version_config.engine_version)[0]}"
