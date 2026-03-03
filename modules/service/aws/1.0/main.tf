@@ -2,10 +2,10 @@ locals {
   # Core instance spec
   spec = lookup(var.instance, "spec", {})
 
-  aws_advanced_config   = try(var.instance.advanced.aws, {})
-  aws_cloud_permissions = try(local.spec.cloud_permissions.aws, {})
-  enable_irsa           = try(local.aws_cloud_permissions.enable_irsa, try(local.aws_advanced_config.enable_irsa, false))
-  iam_arns              = try(local.aws_cloud_permissions.iam_policies, try(local.aws_advanced_config.iam, {}))
+  aws_advanced_config   = lookup(lookup(var.instance, "advanced", {}), "aws", {})
+  aws_cloud_permissions = lookup(lookup(local.spec, "cloud_permissions", {}), "aws", {})
+  enable_irsa           = lookup(local.aws_cloud_permissions, "enable_irsa", lookup(local.aws_advanced_config, "enable_irsa", false))
+  iam_arns              = lookup(local.aws_cloud_permissions, "iam_policies", lookup(local.aws_advanced_config, "iam", {}))
   sa_name               = lower(var.instance_name)
 
   # Spec type for actions (application, cronjob, job, statefulset)
