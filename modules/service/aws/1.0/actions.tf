@@ -1,10 +1,18 @@
+locals {
+  facets_environment = merge(var.environment, {
+    timezone            = try(var.instance.spec.timezone, try(var.environment.timezone, "UTC"))
+    default_tolerations = try(var.instance.spec.default_tolerations, try(var.environment.default_tolerations, []))
+    global_variables    = {}
+  })
+}
+
 # Deployment Actions
 resource "facets_tekton_action_kubernetes" "rollout_restart_deployment" {
   count = local.enable_deployment_actions
   name  = "rollout-restart-${local.spec_type}"
 
   facets_resource_name = var.instance_name
-  facets_environment   = var.environment
+  facets_environment   = local.facets_environment
   facets_resource      = var.instance
 
   description = "This task performs a rollout restart of Kubernetes deployments based on labels."
@@ -83,7 +91,7 @@ resource "facets_tekton_action_kubernetes" "scale_down_deployment" {
   name  = "scale-down-${local.spec_type}"
 
   facets_resource_name = var.instance_name
-  facets_environment   = var.environment
+  facets_environment   = local.facets_environment
   facets_resource      = var.instance
 
   description = "This task scales down Kubernetes service to 0 replicas based on labels."
@@ -168,7 +176,7 @@ resource "facets_tekton_action_kubernetes" "scale_up_deployment" {
   name  = "scale-up-${local.spec_type}"
 
   facets_resource_name = var.instance_name
-  facets_environment   = var.environment
+  facets_environment   = local.facets_environment
   facets_resource      = var.instance
 
   description = "This task scales up Kubernetes deployments to their original replica count based on stored annotation."
@@ -258,7 +266,7 @@ resource "facets_tekton_action_kubernetes" "rollout_restart_statefulset" {
   name  = "rollout-restart-${local.spec_type}"
 
   facets_resource_name = var.instance_name
-  facets_environment   = var.environment
+  facets_environment   = local.facets_environment
   facets_resource      = var.instance
 
   description = "This task performs a rollout restart of Kubernetes statefulsets based on labels."
@@ -337,7 +345,7 @@ resource "facets_tekton_action_kubernetes" "scale_down_statefulset" {
   name  = "scale-down-${local.spec_type}"
 
   facets_resource_name = var.instance_name
-  facets_environment   = var.environment
+  facets_environment   = local.facets_environment
   facets_resource      = var.instance
 
   description = "This task scales down Kubernetes statefulsets to 0 replicas based on labels."
@@ -422,7 +430,7 @@ resource "facets_tekton_action_kubernetes" "scale_up_statefulset" {
   name  = "scale-up-${local.spec_type}"
 
   facets_resource_name = var.instance_name
-  facets_environment   = var.environment
+  facets_environment   = local.facets_environment
   facets_resource      = var.instance
 
   description = "This task scales up Kubernetes statefulsets to their original replica count based on stored annotation."
