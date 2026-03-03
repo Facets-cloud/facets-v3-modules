@@ -28,6 +28,9 @@ inputs:
 intent: kubernetes_cluster
 outputs:
     attributes:
+        title: Kubernetes Cluster Output
+        type: '@facets/kubernetes-details'
+    default:
         providers:
             helm:
                 attributes:
@@ -60,9 +63,6 @@ outputs:
                     host: cluster_endpoint
                 source: hashicorp/kubernetes-alpha
                 version: 0.6.0
-        title: Kubernetes Cluster Output
-        type: '@facets/kubernetes-details'
-    default:
         description: Additional EKS cluster attributes without provider configuration
         title: EKS Cluster Attributes
         type: '@facets/eks'

@@ -347,8 +347,8 @@ controller:
       memory: ${lookup(lookup(lookup(var.instance.spec, "resources", {}), "requests", {}), "memory", "200Mi")}
     ${lookup(var.instance.spec, "resources", null) != null && lookup(lookup(var.instance.spec, "resources", {}), "limits", null) != null ? <<LIMITS
 limits:
-      cpu: ${lookup(lookup(var.instance.spec, "resources", {}), "limits", {}).cpu}
-      memory: ${lookup(lookup(var.instance.spec, "resources", {}), "limits", {}).memory}
+      cpu: ${lookup(lookup(lookup(var.instance.spec, "resources", {}), "limits", {}), "cpu", "500m")}
+      memory: ${lookup(lookup(lookup(var.instance.spec, "resources", {}), "limits", {}), "memory", "512Mi")}
 LIMITS
     : ""}
   autoscaling:

@@ -28,8 +28,9 @@ locals {
     cluster_iam_role_arn              = module.eks.cluster_iam_role_arn
     cluster_primary_security_group_id = module.eks.cluster_primary_security_group_id
     cluster_security_group_id         = module.eks.cluster_security_group_id
-    cloud_provider                    = "AWS"
+    cloud_provider                    = "aws"
     cluster_location                  = local.aws_region
+    node_pool_id                      = ""
     kubernetes_provider_exec = {
       api_version = "client.authentication.k8s.io/v1beta1"
       command     = "aws"
@@ -59,8 +60,5 @@ output "default" {
 }
 
 output "attributes" {
-  value = {
-    attributes = local.output_attributes
-    interfaces = local.output_interfaces
-  }
+  value = local.output_attributes
 }
