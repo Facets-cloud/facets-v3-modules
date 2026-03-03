@@ -609,6 +609,11 @@ spec:
       type: boolean
       title: Force SSL Redirection
       description: Force HTTP to HTTPS redirection
+    timezone:
+      type: string
+      title: Timezone
+      description: Timezone for the ingress controller
+      default: UTC
   required:
   - private
   - rules

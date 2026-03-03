@@ -53,9 +53,8 @@ resource "aws_db_subnet_group" "aurora" {
   }
 }
 
-# Create security group for Aurora cluster (skip if importing)
+# Create security group for Aurora cluster - Always created to avoid dynamic count issues during plan
 resource "aws_security_group" "aurora" {
-  count       = local.is_import ? 0 : 1
   name_prefix = "${local.cluster_identifier}-"
   vpc_id      = var.inputs.vpc_details.attributes.vpc_id
 
@@ -79,6 +78,12 @@ resource "aws_security_group" "aurora" {
 
   lifecycle {
     prevent_destroy = true
+    ignore_changes = [
+      name_prefix,
+      vpc_id,
+      ingress,
+      egress
+    ]
   }
 }
 
@@ -103,9 +108,9 @@ resource "aws_rds_cluster" "aurora" {
   preferred_backup_window      = "03:00-04:00"
   preferred_maintenance_window = "sun:04:00-sun:05:00"
 
-  # Network and security - use existing resources when importing
+  # Network and security
   db_subnet_group_name   = local.is_import ? null : (length(aws_db_subnet_group.aurora) > 0 ? aws_db_subnet_group.aurora[0].name : null)
-  vpc_security_group_ids = local.is_import ? null : (length(aws_security_group.aurora) > 0 ? [aws_security_group.aurora[0].id] : null)
+  vpc_security_group_ids = [aws_security_group.aurora.id]
   storage_encrypted      = true # Always enabled
 
   # Testing configurations
@@ -137,7 +142,7 @@ resource "aws_rds_cluster" "aurora" {
       master_username,
       master_password,
       db_subnet_group_name,
-      vpc_security_group_ids
+      vpc_security_group_ids # Ignore security group changes
     ]
   }
 }
@@ -204,7 +209,3 @@ resource "aws_rds_cluster_instance" "aurora_readers" {
     ]
   }
 }
-
-# Password management - using random password generation only
-# The password is stored in Terraform state and accessible via output interfaces
-# For production use, consider external secret management solutions

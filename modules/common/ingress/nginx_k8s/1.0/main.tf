@@ -367,7 +367,7 @@ LIMITS
     ${length(local.custom_http_errors) > 0 ? "custom-http-errors: \"${local.custom_http_errors}\"" : ""}
   extraEnvs:
     - name: "TZ"
-      value: ${var.environment.timezone}
+      value: ${try(var.instance.spec.timezone, try(var.environment.timezone, "UTC"))}
   extraArgs:
     enable-ssl-chain-completion: "true"
   metrics:

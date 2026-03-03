@@ -13,11 +13,6 @@ locals {
   security_group_id   = local.is_security_group_import ? var.instance.spec.imports.security_group_id : null
 
   # Add suffix to replica names when importing to avoid conflicts with existing replicas
-  # This ensures new Terraform-managed replicas don't conflict with pre-existing unmanaged replicas
-  # Reserve 15 characters for suffix: "-imp-replica-5" (worst case scenario)
-  # This leaves 48 characters for the base identifier when importing, 52 when not importing
-
-  # Helper to truncate without ending on hyphen
   base_for_import = substr(local.db_identifier, 0, 44)
   base_cleaned    = substr(local.base_for_import, -1, 1) == "-" ? substr(local.base_for_import, 0, 43) : local.base_for_import
 
@@ -40,17 +35,5 @@ locals {
   mysql_port = 3306
 
   # Performance Insights support - only supported on certain instance classes
-  # db.t3.micro and db.t3.small don't support Performance Insights
   performance_insights_supported = !contains(["db.t3.micro", "db.t3.small"], var.instance.spec.sizing.instance_class)
-
-  # Enhanced Security Group Logic
-  # Detect if security group exists by name (when not explicitly importing)
-  # This logic is evaluated after the data source runs
-  sg_exists_by_name = !local.is_security_group_import && length(try(data.aws_security_groups.existing_sg[0].ids, [])) > 0
-
-  # Determine if we should create a new security group
-  should_create_security_group = !local.is_security_group_import && !local.sg_exists_by_name
-
-  # Security group source for logging/transparency
-  sg_source = local.is_security_group_import ? "imported" : (local.sg_exists_by_name ? "existing" : "created")
 }

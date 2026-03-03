@@ -34,21 +34,16 @@ locals {
   # Use imported or created subnet group
   actual_subnet_group_name = local.import_enabled ? (lookup(var.instance.spec.imports, "subnet_group_name", null) != null ? var.instance.spec.imports.subnet_group_name : (length(aws_db_subnet_group.postgres) > 0 ? aws_db_subnet_group.postgres[0].name : null)) : (length(aws_db_subnet_group.postgres) > 0 ? aws_db_subnet_group.postgres[0].name : null)
 
-  # Use imported or created security group
-  actual_security_group_id = local.import_enabled ? (lookup(var.instance.spec.imports, "security_group_id", null) != null ? var.instance.spec.imports.security_group_id : (length(aws_security_group.postgres) > 0 ? aws_security_group.postgres[0].id : null)) : (length(aws_security_group.postgres) > 0 ? aws_security_group.postgres[0].id : null)
+  # Use the managed security group. If user wants to override, they use imports + ignore_changes handles it.
+  actual_security_group_id = aws_security_group.postgres.id
 
   # Determine the correct source DB identifier for replicas
-  # Use imported identifier if importing, otherwise use the generated identifier
-  replica_source_identifier = local.is_importing ? lookup(var.instance.spec.imports, "db_instance_identifier", aws_db_instance.postgres.identifier) : aws_db_instance.postgres.identifier
+  replica_source_identifier = aws_db_instance.postgres.identifier
 
   # Parameter group name for consistency
   parameter_group_for_replica = "default.postgres${split(".", var.instance.spec.version_config.engine_version)[0]}"
 
   # Add suffix to replica names when importing to avoid conflicts with existing replicas
-  # This ensures new Terraform-managed replicas don't conflict with pre-existing unmanaged replicas
-  # Reserve 15 characters for suffix: "-imp-replica-5" (worst case scenario)
-  # This leaves 48 characters for the base identifier when importing, 52 when not importing
-
   # Helper to truncate without ending on hyphen
   base_for_import = substr(local.db_instance_identifier, 0, 44)
   base_cleaned    = substr(local.base_for_import, -1, 1) == "-" ? substr(local.base_for_import, 0, 43) : local.base_for_import
@@ -103,10 +98,8 @@ resource "aws_db_subnet_group" "postgres" {
   }
 }
 
-# Security Group for RDS - only create if not importing
+# Security Group for RDS - Always created to avoid dynamic count issues during plan
 resource "aws_security_group" "postgres" {
-  count = local.import_enabled ? (lookup(var.instance.spec.imports, "security_group_id", null) != null ? 0 : 1) : 1
-
   name_prefix = "${local.security_group_name}-"
   vpc_id      = var.inputs.vpc_details.attributes.vpc_id
   description = "Security group for PostgreSQL RDS instance ${local.db_instance_identifier}"
@@ -136,6 +129,13 @@ resource "aws_security_group" "postgres" {
   lifecycle {
     prevent_destroy       = true
     create_before_destroy = true
+    ignore_changes = [
+      name_prefix,
+      vpc_id,
+      description,
+      ingress,
+      egress
+    ]
   }
 }
 
@@ -162,7 +162,7 @@ resource "aws_db_instance" "postgres" {
 
   # Network configuration
   db_subnet_group_name   = local.actual_subnet_group_name
-  vpc_security_group_ids = local.actual_security_group_id != null ? [local.actual_security_group_id] : []
+  vpc_security_group_ids = [local.actual_security_group_id]
   publicly_accessible    = false # Always private
 
   # Backup configuration (hardcoded for security)
@@ -198,7 +198,7 @@ resource "aws_db_instance" "postgres" {
     ignore_changes = [
       # Ignore changes that would trigger recreation when importing
       db_subnet_group_name,
-      vpc_security_group_ids,
+      vpc_security_group_ids, # Ignore security group changes
       # Ignore password and username when importing since we don't know them
       username,
       password,
@@ -219,7 +219,7 @@ resource "aws_db_instance" "read_replicas" {
   instance_class      = var.instance.spec.sizing.instance_class
 
   # Use same security group as primary
-  vpc_security_group_ids = local.actual_security_group_id != null ? [local.actual_security_group_id] : []
+  vpc_security_group_ids = [local.actual_security_group_id]
   publicly_accessible    = false
 
   # Storage configuration (inherited from source)
@@ -247,7 +247,7 @@ resource "aws_db_instance" "read_replicas" {
     ignore_changes = [
       # Ignore changes to the source DB after creation
       replicate_source_db,
-      # Ignore security group changes that might happen on the primary
+      # Ignore security group changes
       vpc_security_group_ids,
       # Ignore parameter group changes that might occur after primary instance changes
       parameter_group_name

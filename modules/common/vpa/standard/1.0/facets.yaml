@@ -182,6 +182,22 @@ spec:
       description: Additional Helm values to override defaults
       x-ui-yaml-editor: true
       x-ui-placeholder: Enter custom Helm values in YAML format
+    default_tolerations:
+      type: array
+      title: Default Tolerations
+      description: List of default tolerations for VPA pods
+      items:
+        type: object
+        properties:
+          key:
+            type: string
+          operator:
+            type: string
+          value:
+            type: string
+          effect:
+            type: string
+      default: []
   required:
   - version
   - namespace

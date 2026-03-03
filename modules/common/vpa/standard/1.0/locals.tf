@@ -66,7 +66,7 @@ locals {
   nodepool_tolerations = try(local.nodepool_config.attributes.taints, [])
   nodepool_labels      = try(local.nodepool_config.attributes.node_selector, {})
 
-  # Use nodepool configuration if available, otherwise use default tolerations
-  tolerations  = length(local.nodepool_tolerations) > 0 ? local.nodepool_tolerations : try(var.environment.default_tolerations, [])
+  # Use nodepool configuration if available, otherwise use default tolerations from spec or environment
+  tolerations  = length(local.nodepool_tolerations) > 0 ? local.nodepool_tolerations : try(local.spec.default_tolerations, try(var.environment.default_tolerations, []))
   nodeSelector = local.nodepool_labels
 }

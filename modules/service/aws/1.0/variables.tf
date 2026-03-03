@@ -253,15 +253,19 @@ variable "instance_name" {
 variable "environment" {
   description = "Environment configuration including namespace and other environment-specific settings"
   type = object({
-    name        = optional(string)
-    unique_name = string
-    namespace   = string
-    cloud_tags  = optional(map(string), {})
+    name                = optional(string)
+    unique_name         = string
+    namespace           = string
+    cloud_tags          = optional(map(string), {})
+    timezone            = optional(string, "UTC")
+    default_tolerations = optional(list(any), [])
   })
   default = {
-    name        = "default"
-    unique_name = "default-unique"
-    namespace   = "default"
-    cloud_tags  = {}
+    name                = "default"
+    unique_name         = "default-unique"
+    namespace           = "default"
+    cloud_tags          = {}
+    timezone            = "UTC"
+    default_tolerations = []
   }
 }

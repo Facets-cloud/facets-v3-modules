@@ -31,11 +31,23 @@ locals {
     cloud_provider                    = "aws"
     cluster_location                  = local.aws_region
     node_pool_id                      = ""
+    resource_name                     = var.instance_name
+    resource_type                     = "kubernetes_cluster"
     kubernetes_provider_exec = {
       api_version = "client.authentication.k8s.io/v1beta1"
       command     = "aws"
       args        = local.eks_get_token_args
     }
+    # Redundant attributes map for modules expecting nested attributes (AlertRules, ECK, etc.)
+    attributes = {
+      cluster_endpoint = module.eks.cluster_endpoint
+      cluster_name     = module.eks.cluster_name
+      cloud_provider   = "aws"
+      resource_name    = var.instance_name
+      resource_type    = "kubernetes_cluster"
+    }
+    # Redundant interfaces map
+    interfaces = local.output_interfaces
     secrets = ["cluster_ca_certificate", "kubernetes_provider_exec"]
   }
   output_interfaces = {

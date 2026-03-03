@@ -1055,6 +1055,27 @@ spec:
       description: Map of environment variables passed to the main container.
       type: object
       x-ui-yaml-editor: true
+    default_tolerations:
+      type: array
+      title: Default Tolerations
+      description: List of default tolerations for the service pods
+      items:
+        type: object
+        properties:
+          key:
+            type: string
+          operator:
+            type: string
+          value:
+            type: string
+          effect:
+            type: string
+      default: []
+    timezone:
+      type: string
+      title: Timezone
+      description: Timezone for the service container
+      default: UTC
     init_containers:
       title: Init Containers
       description: Map of specialized containers that run before app containers in

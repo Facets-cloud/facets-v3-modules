@@ -28,6 +28,35 @@ inputs:
 intent: kubernetes_cluster
 outputs:
     attributes:
+        providers:
+            helm:
+                attributes:
+                    kubernetes:
+                        cluster_ca_certificate: cluster_ca_certificate
+                        exec:
+                            api_version: kubernetes_provider_exec.api_version
+                            args: kubernetes_provider_exec.args
+                            command: kubernetes_provider_exec.command
+                        host: cluster_endpoint
+                source: hashicorp/helm
+            kubernetes:
+                attributes:
+                    cluster_ca_certificate: cluster_ca_certificate
+                    exec:
+                        api_version: kubernetes_provider_exec.api_version
+                        args: kubernetes_provider_exec.args
+                        command: kubernetes_provider_exec.command
+                    host: cluster_endpoint
+                source: hashicorp/kubernetes
+            kubernetes-alpha:
+                attributes:
+                    cluster_ca_certificate: cluster_ca_certificate
+                    exec:
+                        api_version: kubernetes_provider_exec.api_version
+                        args: kubernetes_provider_exec.args
+                        command: kubernetes_provider_exec.command
+                    host: cluster_endpoint
+                source: hashicorp/kubernetes-alpha
         title: Kubernetes Cluster Output
         type: '@facets/kubernetes-details'
     default:
@@ -42,7 +71,6 @@ outputs:
                             command: kubernetes_provider_exec.command
                         host: cluster_endpoint
                 source: hashicorp/helm
-                version: 2.17.0
             kubernetes:
                 attributes:
                     cluster_ca_certificate: cluster_ca_certificate
@@ -52,7 +80,6 @@ outputs:
                         command: kubernetes_provider_exec.command
                     host: cluster_endpoint
                 source: hashicorp/kubernetes
-                version: 2.38.0
             kubernetes-alpha:
                 attributes:
                     cluster_ca_certificate: cluster_ca_certificate
@@ -62,7 +89,6 @@ outputs:
                         command: kubernetes_provider_exec.command
                     host: cluster_endpoint
                 source: hashicorp/kubernetes-alpha
-                version: 0.6.0
         description: Additional EKS cluster attributes without provider configuration
         title: EKS Cluster Attributes
         type: '@facets/eks'

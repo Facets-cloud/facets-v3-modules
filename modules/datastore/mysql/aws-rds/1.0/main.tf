@@ -3,9 +3,9 @@ resource "random_password" "master_password" {
   count            = local.is_restore_operation ? 0 : 1
   length           = 16
   special          = true
-  upper            = true
-  lower            = true
-  numeric          = true
+  upper   = true
+  lower   = true
+  numeric = true
   override_special = "!#$%&*()-_=+[]{}<>:?"
 
   lifecycle {
@@ -43,24 +43,8 @@ data "aws_db_subnet_group" "imported" {
   name  = local.subnet_group_name
 }
 
-# Data source to check if security group already exists by name
-data "aws_security_groups" "existing_sg" {
-  count = !local.is_security_group_import ? 1 : 0
-
-  filter {
-    name   = "group-name"
-    values = [local.security_group_name]
-  }
-
-  filter {
-    name   = "vpc-id"
-    values = [var.inputs.vpc_details.attributes.vpc_id]
-  }
-}
-
-# Create security group for MySQL (only if not importing AND doesn't already exist)
+# Create security group for MySQL - Always created to avoid dynamic count issues during plan
 resource "aws_security_group" "mysql" {
-  count       = local.should_create_security_group ? 1 : 0
   name        = local.security_group_name
   description = "Security group for MySQL RDS instance ${var.instance_name}"
   vpc_id      = var.inputs.vpc_details.attributes.vpc_id
@@ -92,19 +76,13 @@ resource "aws_security_group" "mysql" {
   lifecycle {
     prevent_destroy = true
     ignore_changes = [
-      name,        # Ignore name changes for imported resources
-      vpc_id,      # Ignore VPC changes for imported resources
-      description, # Ignore description changes for imported resources
-      ingress,     # Ignore ingress rule changes for imported resources
-      egress       # Ignore egress rule changes for imported resources
+      name,
+      vpc_id,
+      description,
+      ingress,
+      egress
     ]
   }
-}
-
-# Data source to fetch imported security group
-data "aws_security_group" "imported" {
-  count = local.is_security_group_import ? 1 : 0
-  id    = local.security_group_id
 }
 
 # Local variables for resource references
@@ -112,11 +90,8 @@ locals {
   # Get the actual subnet group name (imported or created)
   actual_subnet_group_name = local.is_subnet_group_import ? data.aws_db_subnet_group.imported[0].name : (length(aws_db_subnet_group.mysql) > 0 ? aws_db_subnet_group.mysql[0].name : null)
 
-  # Get the actual security group ID from all sources (imported, existing by name, or created)
-  actual_security_group_id = local.is_security_group_import ? data.aws_security_group.imported[0].id : (
-    local.sg_exists_by_name ? data.aws_security_groups.existing_sg[0].ids[0] :
-    (length(aws_security_group.mysql) > 0 ? aws_security_group.mysql[0].id : null)
-  )
+  # Use the managed security group. If user wants to override, they use imports + ignore_changes handles it.
+  actual_security_group_id = aws_security_group.mysql.id
 
   # Always use the main mysql resource identifier for read replicas
   mysql_instance_identifier = aws_db_instance.mysql.identifier
@@ -124,8 +99,6 @@ locals {
 
 # Create the MySQL RDS instance (handles new, imported, and restored instances)
 resource "aws_db_instance" "mysql" {
-  # Removed count parameter to allow imports - resource always exists
-
   # Basic configuration
   identifier     = local.db_identifier
   engine         = "mysql"
@@ -184,7 +157,7 @@ resource "aws_db_instance" "mysql" {
       db_name,                   # Database name might be different when importing
       final_snapshot_identifier, # Timestamp will always change
       db_subnet_group_name,      # Ignore subnet group name changes for imported resources
-      vpc_security_group_ids,    # Ignore security group changes for imported resources
+      vpc_security_group_ids,    # Ignore security group changes (handled via imports or manual changes)
       engine_version,            # Prevent forced upgrades on imported instances
       storage_type,              # Storage type changes require recreation
       storage_encrypted,         # Encryption cannot be changed after creation
@@ -235,7 +208,7 @@ resource "aws_db_instance" "read_replicas" {
     ignore_changes = [
       identifier,            # Ignore identifier changes for imported resources
       replicate_source_db,   # Ignore source DB changes for flexibility
-      vpc_security_group_ids # Ignore security group changes for imported resources
+      vpc_security_group_ids # Ignore security group changes
     ]
   }
 
@@ -246,38 +219,3 @@ resource "aws_db_instance" "read_replicas" {
     Role   = "read-replica"
   })
 }
-
-# Import blocks for Terraform to manage existing resources
-# These are handled by the Facets platform based on the imports section in facets.yaml
-
-# For imported DB instances, we need to handle certain attributes differently
-# The ignore_changes in lifecycle blocks ensure that imported resources
-# don't get recreated due to differences in configuration
-
-# Important: When importing resources, the following attributes are ignored:
-# - Resource identifiers/names (to prevent recreation)
-# - Network configurations (subnet groups, security groups)
-# - Ingress/egress rules for security groups
-# - Engine version (to prevent forced upgrades)
-# - Storage type and encryption (cannot be changed without recreation)
-# These can genuinely only be changed by recreating the resources
-
-# When importing existing instances, read replicas get "imp" suffix to avoid conflicts
-# with existing unmanaged replicas. This allows gradual migration to Terraform management.
-
-# Password management - using random password generation only for new instances
-# For imported instances, passwords are managed externally
-# The password is stored in Terraform state and accessible via output interfaces
-# For production use, consider external secret management solutions
-
-# Enhanced Security Group Handling:
-# The module now supports three security group scenarios:
-# 1. EXPLICIT IMPORT: User provides security_group_id in imports section
-# 2. EXISTING BY NAME: Security group with same name already exists in VPC 
-# 3. CREATE NEW: No existing security group found, creates new one
-#
-# This prevents the "security group already exists" error by:
-# - Using data source to check for existing security groups by name
-# - Only creating new security group when none exists and not explicitly importing
-# - Transparently using existing security groups when found
-# - Providing sg_source output to show which approach was used

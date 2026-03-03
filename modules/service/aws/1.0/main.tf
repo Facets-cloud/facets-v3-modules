@@ -137,7 +137,11 @@ module "app-helm-chart" {
   values         = local.instance_with_vpa_config
   annotations    = local.annotations
   labels         = local.labels
-  environment    = var.environment
+  environment    = merge(var.environment, {
+    timezone            = try(var.instance.spec.timezone, try(var.environment.timezone, "UTC"))
+    default_tolerations = try(var.instance.spec.default_tolerations, try(var.environment.default_tolerations, []))
+    global_variables    = {}
+  })
   inputs         = local.modified_inputs
   vpa_release_id = try(var.inputs.vpa_details.attributes.helm_release_id, "")
 }

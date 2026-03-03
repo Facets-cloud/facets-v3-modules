@@ -99,11 +99,6 @@ variable "inputs" {
   })
 
   validation {
-    condition     = var.inputs.aws_provider.attributes.aws_iam_role != ""
-    error_message = "AWS IAM role must be provided"
-  }
-
-  validation {
     condition     = var.inputs.vpc_details.attributes.vpc_id != ""
     error_message = "VPC ID must be provided"
   }
