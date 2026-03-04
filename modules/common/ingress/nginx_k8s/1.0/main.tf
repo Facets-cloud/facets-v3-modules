@@ -478,7 +478,7 @@ resource "aws_route53_record" "cluster-base-domain" {
     local.record_type == "CNAME" ? data.kubernetes_service.nginx-ingress-ctlr.status.0.load_balancer.0.ingress.0.hostname : data.kubernetes_service.nginx-ingress-ctlr.status.0.load_balancer.0.ingress.0.ip
   ]
   lifecycle {
-    prevent_destroy = true
+    prevent_destroy = false
   }
 }
 resource "aws_route53_record" "cluster-base-domain-wildcard" {
@@ -494,7 +494,7 @@ resource "aws_route53_record" "cluster-base-domain-wildcard" {
     local.record_type == "CNAME" ? data.kubernetes_service.nginx-ingress-ctlr.status.0.load_balancer.0.ingress.0.hostname : data.kubernetes_service.nginx-ingress-ctlr.status.0.load_balancer.0.ingress.0.ip
   ]
   lifecycle {
-    prevent_destroy = true
+    prevent_destroy = false
   }
 
 }

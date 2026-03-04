@@ -59,7 +59,7 @@ resource "google_managed_kafka_connect_cluster" "main" {
   })
 
   lifecycle {
-    prevent_destroy = true
+    prevent_destroy = false
   }
 
   depends_on = [google_managed_kafka_cluster.main]

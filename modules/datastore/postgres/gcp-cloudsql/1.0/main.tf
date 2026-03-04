@@ -107,7 +107,7 @@ resource "google_sql_database_instance" "postgres_instance" {
 
   # Lifecycle management optimized for import compatibility
   lifecycle {
-    prevent_destroy = true
+    prevent_destroy = false
     ignore_changes = [
       name,                                            # CRITICAL: Ignore name to allow importing different named instances
       deletion_protection,                             # Ignore deletion protection changes
@@ -131,7 +131,7 @@ resource "google_sql_database" "initial_database" {
   instance = google_sql_database_instance.postgres_instance.name
 
   lifecycle {
-    prevent_destroy = true
+    prevent_destroy = false
     ignore_changes = [
       name,      # Always ignore name changes for import compatibility
       instance,  # Always ignore instance name changes
@@ -148,7 +148,7 @@ resource "google_sql_user" "postgres_user" {
   password = var.instance.spec.restore_config.restore_from_backup ? var.instance.spec.restore_config.master_password : random_password.postgres_password[0].result
 
   lifecycle {
-    prevent_destroy = true
+    prevent_destroy = false
     ignore_changes = [
       name,     # Always ignore name changes for import compatibility
       instance, # Always ignore instance name changes
@@ -212,7 +212,7 @@ resource "google_sql_database_instance" "read_replica" {
 
   # Lifecycle management for replicas optimized for import compatibility
   lifecycle {
-    prevent_destroy = true
+    prevent_destroy = false
     ignore_changes = [
       name,                                                # Ignore name changes
       deletion_protection,                                 # Ignore deletion protection changes

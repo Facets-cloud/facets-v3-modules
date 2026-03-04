@@ -14,7 +14,7 @@ resource "azurerm_private_dns_zone" "postgresql" {
   tags                = local.common_tags
 
   lifecycle {
-    #prevent_destroy = true # Facets best practice - protect critical resources
+    #prevent_destroy = false # Facets best practice - protect critical resources
     ignore_changes = [tags]
   }
 }
@@ -46,7 +46,7 @@ resource "azurerm_private_dns_zone" "mysql" {
   tags                = local.common_tags
 
   lifecycle {
-    #prevent_destroy = true # Facets best practice - protect critical resources
+    #prevent_destroy = false # Facets best practice - protect critical resources
     ignore_changes = [tags]
   }
 }

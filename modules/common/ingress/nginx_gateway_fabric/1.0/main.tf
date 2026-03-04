@@ -1191,7 +1191,7 @@ resource "aws_route53_record" "cluster-base-domain" {
   ttl     = "300"
   records = [local.lb_record_value]
   lifecycle {
-    prevent_destroy = true
+    prevent_destroy = false
   }
 }
 
@@ -1207,6 +1207,6 @@ resource "aws_route53_record" "cluster-base-domain-wildcard" {
   ttl     = "300"
   records = [local.lb_record_value]
   lifecycle {
-    prevent_destroy = true
+    prevent_destroy = false
   }
 }

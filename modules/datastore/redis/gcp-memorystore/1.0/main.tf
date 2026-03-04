@@ -43,7 +43,7 @@ resource "google_redis_instance" "main" {
 
   # Lifecycle management - prevents accidental deletion and ignores external changes
   lifecycle {
-    prevent_destroy = true
+    prevent_destroy = false
     ignore_changes = [
       name,
       region,

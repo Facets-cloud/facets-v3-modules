@@ -172,7 +172,7 @@ resource "aws_msk_cluster" "main" {
   tags = local.common_tags
 
   lifecycle {
-    prevent_destroy = true
+    prevent_destroy = false
     ignore_changes = [
       # Ignore name changes for imported resources
       cluster_name,

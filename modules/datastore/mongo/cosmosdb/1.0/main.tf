@@ -70,7 +70,7 @@ resource "azurerm_cosmosdb_account" "mongodb" {
 
   # Prevent accidental deletion
   lifecycle {
-    prevent_destroy = true
+    prevent_destroy = false
     # Always ignore these to prevent recreation
     ignore_changes = [
       location,
@@ -151,7 +151,7 @@ resource "azurerm_cosmosdb_account" "mongodb_restored" {
 
   # Prevent accidental deletion
   lifecycle {
-    prevent_destroy = true
+    prevent_destroy = false
   }
 
   tags = merge(var.environment.cloud_tags, {
@@ -179,7 +179,7 @@ resource "azurerm_cosmosdb_mongo_database" "main" {
   }
 
   lifecycle {
-    prevent_destroy = true
+    prevent_destroy = false
     # Always ignore throughput changes to prevent drift
     ignore_changes = [autoscale_settings, throughput]
   }
@@ -201,6 +201,6 @@ resource "azurerm_cosmosdb_mongo_database" "main_restored" {
   }
 
   lifecycle {
-    prevent_destroy = true
+    prevent_destroy = false
   }
 }

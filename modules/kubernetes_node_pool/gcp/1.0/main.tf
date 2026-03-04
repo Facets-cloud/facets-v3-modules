@@ -125,6 +125,6 @@ resource "google_container_node_pool" "node_pool" {
   lifecycle {
     ignore_changes        = [version, node_config.0.image_type, initial_node_count, network_config.0.enable_private_nodes]
     create_before_destroy = true
-    prevent_destroy       = true
+    prevent_destroy = false
   }
 }

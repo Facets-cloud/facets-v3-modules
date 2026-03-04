@@ -112,7 +112,7 @@ resource "aws_docdb_cluster" "main" {
   })
 
   lifecycle {
-    prevent_destroy = true
+    prevent_destroy = false
     ignore_changes = [
       # Prevent recreation for these attributes that would require delete/recreate
       db_subnet_group_name,
@@ -147,7 +147,7 @@ resource "aws_docdb_cluster_instance" "cluster_instances" {
   })
 
   lifecycle {
-    prevent_destroy = true
+    prevent_destroy = false
     ignore_changes = [
       identifier,
       instance_class,

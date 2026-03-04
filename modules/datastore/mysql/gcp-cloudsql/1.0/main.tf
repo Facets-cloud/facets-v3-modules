@@ -114,7 +114,7 @@ resource "google_sql_database_instance" "mysql_instance" {
 
   # Comprehensive lifecycle management to prevent stale data errors and handle imports
   lifecycle {
-    prevent_destroy = true
+    prevent_destroy = false
     ignore_changes = [
       name,                              # Ignore name changes for imported resources
       database_version,                  # Ignore version changes for imported resources
@@ -141,7 +141,7 @@ resource "google_sql_database" "initial_database" {
   deletion_policy = "DELETE"
 
   lifecycle {
-    prevent_destroy = true
+    prevent_destroy = false
     ignore_changes = [
       name,            # Ignore name changes for imported resources
       instance,        # Ignore instance changes for imported resources
@@ -161,7 +161,7 @@ resource "google_sql_user" "mysql_root_user" {
   )
 
   lifecycle {
-    prevent_destroy = true
+    prevent_destroy = false
     ignore_changes = [
       name,     # Ignore name changes for imported resources
       instance, # Ignore instance changes for imported resources
@@ -210,7 +210,7 @@ resource "google_sql_database_instance" "read_replica" {
 
   # Comprehensive lifecycle management for replicas to prevent stale data errors and handle imports
   lifecycle {
-    prevent_destroy = true
+    prevent_destroy = false
     ignore_changes = [
       name,                          # Ignore name changes for imported resources
       database_version,              # Ignore version changes for imported resources

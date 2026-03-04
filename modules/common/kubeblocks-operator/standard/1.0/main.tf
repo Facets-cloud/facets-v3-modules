@@ -109,7 +109,7 @@ resource "helm_release" "kubeblocks" {
   depends_on = [kubernetes_job.install_crds]
 
   lifecycle {
-    prevent_destroy = true
+    prevent_destroy = false
   }
 }
 
@@ -208,6 +208,6 @@ resource "helm_release" "database_addons" {
   ]
 
   lifecycle {
-    prevent_destroy = true
+    prevent_destroy = false
   }
 }

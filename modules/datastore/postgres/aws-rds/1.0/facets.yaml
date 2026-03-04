@@ -107,7 +107,7 @@ spec:
           title: Enable Deletion Protection
           description: Protect database from accidental deletion (recommended for
             production)
-          default: true
+          default: false
       required:
       - deletion_protection
     restore_config:

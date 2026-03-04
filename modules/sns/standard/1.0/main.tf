@@ -59,7 +59,7 @@ resource "aws_sns_topic" "main" {
   tags = local.all_tags
 
   lifecycle {
-    prevent_destroy = true
+    prevent_destroy = false
   }
 }
 

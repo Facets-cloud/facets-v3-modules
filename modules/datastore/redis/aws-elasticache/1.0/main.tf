@@ -131,7 +131,7 @@ resource "aws_elasticache_replication_group" "redis" {
   )
 
   lifecycle {
-    prevent_destroy = true
+    prevent_destroy = false
     ignore_changes = [
       # Ignore changes to snapshot_name after initial creation
       snapshot_name,

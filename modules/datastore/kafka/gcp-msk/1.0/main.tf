@@ -4,7 +4,7 @@ resource "google_kms_key_ring" "kafka" {
   location = local.region
 
   lifecycle {
-    prevent_destroy = true
+    prevent_destroy = false
   }
 }
 
@@ -19,7 +19,7 @@ resource "google_kms_crypto_key" "kafka" {
   })
 
   lifecycle {
-    prevent_destroy = true
+    prevent_destroy = false
   }
 }
 
@@ -63,7 +63,7 @@ resource "google_managed_kafka_cluster" "main" {
   labels = local.common_labels
 
   lifecycle {
-    prevent_destroy = true
+    prevent_destroy = false
   }
 
   depends_on = [google_kms_crypto_key_iam_member.kafka_encrypter_decrypter]

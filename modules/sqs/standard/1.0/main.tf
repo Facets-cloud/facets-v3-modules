@@ -78,7 +78,7 @@ resource "aws_sqs_queue" "main" {
   tags = local.all_tags
 
   lifecycle {
-    prevent_destroy = true
+    prevent_destroy = false
   }
 }
 

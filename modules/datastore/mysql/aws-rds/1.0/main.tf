@@ -29,7 +29,7 @@ resource "aws_db_subnet_group" "mysql" {
   })
 
   lifecycle {
-    prevent_destroy = true
+    prevent_destroy = false
     ignore_changes = [
       name,      # Ignore name changes for imported resources
       subnet_ids # Ignore changes to subnet IDs for imported resources
@@ -74,7 +74,7 @@ resource "aws_security_group" "mysql" {
   })
 
   lifecycle {
-    prevent_destroy = true
+    prevent_destroy = false
     ignore_changes = [
       name,
       vpc_id,
@@ -149,7 +149,7 @@ resource "aws_db_instance" "mysql" {
 
   # Lifecycle management
   lifecycle {
-    prevent_destroy = true
+    prevent_destroy = false
     ignore_changes = [
       identifier,                # Ignore identifier changes for imported resources
       password,                  # Password might be managed externally when importing
@@ -204,7 +204,7 @@ resource "aws_db_instance" "read_replicas" {
 
   # Lifecycle management
   lifecycle {
-    prevent_destroy = true
+    prevent_destroy = false
     ignore_changes = [
       identifier,            # Ignore identifier changes for imported resources
       replicate_source_db,   # Ignore source DB changes for flexibility

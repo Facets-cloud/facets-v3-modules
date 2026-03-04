@@ -10,7 +10,7 @@ resource "azurerm_resource_group" "main" {
   tags = local.common_tags
 
   lifecycle {
-    prevent_destroy = true
+    prevent_destroy = false
   }
 }
 
@@ -24,6 +24,6 @@ resource "azurerm_virtual_network" "main" {
   tags = local.common_tags
 
   lifecycle {
-    prevent_destroy = true
+    prevent_destroy = false
   }
 }

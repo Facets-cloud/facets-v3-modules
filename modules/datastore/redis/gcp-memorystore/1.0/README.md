@@ -58,7 +58,7 @@ When TLS is enabled:
 - Clients must download and install CA certificates from the `attributes.server_ca_certs` output
 
 ### Data Protection
-- **Lifecycle Protection**: `prevent_destroy = true` configuration prevents accidental data loss
+- **Lifecycle Protection**: `prevent_destroy = false` configuration prevents accidental data loss
 - **Backup Strategy**: Memorystore provides automatic backup capabilities through GCP infrastructure
 - **Point-in-time Recovery**: Managed through Google Cloud Console or gcloud CLI
 

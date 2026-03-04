@@ -266,7 +266,7 @@ connect_cluster:
 
 ### 3. Resource Protection
 
-- **Lifecycle Protection**: `prevent_destroy = true` on all resources
+- **Lifecycle Protection**: `prevent_destroy = false` on all resources
 - **Prevents Accidental Deletion**: Kafka cluster, KMS keys, Connect cluster
 
 ## Input Dependencies
@@ -416,7 +416,7 @@ spec:
 
 ## Important Notes
 
-1. **Prevent Destroy**: All resources have `prevent_destroy = true` to prevent accidental deletion
+1. **Prevent Destroy**: All resources have `prevent_destroy = false` to prevent accidental deletion
 2. **KMS Keys**: KMS keys are never deleted, even when cluster is destroyed
 3. **No Downsizing**: Cannot reduce vCPU, memory, or disk after creation
 4. **Region Specific**: Cluster and Connect must be in same region

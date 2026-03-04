@@ -14,7 +14,7 @@ resource "google_managed_kafka_topic" "main" {
   configs = var.instance.spec.configs
 
   lifecycle {
-    prevent_destroy = true
+    prevent_destroy = false
     # Partition count can only be increased, not decreased
     ignore_changes = []
   }

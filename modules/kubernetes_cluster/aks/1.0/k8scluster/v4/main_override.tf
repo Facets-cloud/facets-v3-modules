@@ -292,7 +292,7 @@ resource "azurerm_kubernetes_cluster" "main" {
   }
 
   lifecycle {
-    prevent_destroy = true
+    prevent_destroy = false
 
     ignore_changes = [
       http_application_routing_enabled,
