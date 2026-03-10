@@ -1,0 +1,16 @@
+name: '@facets/dns-zone'
+properties:
+    properties:
+        attributes:
+            properties:
+                domain_name:
+                    type: string
+                name_servers:
+                    type: string
+                zone_id:
+                    type: string
+            type: object
+        interfaces:
+            type: object
+    type: object
+providers: []

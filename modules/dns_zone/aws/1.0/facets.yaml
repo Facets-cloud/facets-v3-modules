@@ -1,0 +1,31 @@
+clouds:
+    - aws
+description: Route 53 hosted zone
+flavor: aws
+inputs:
+    cloud_account:
+        displayName: cloud_account
+        providers:
+            - aws
+        type: '@facets/aws_cloud_account'
+intent: dns_zone
+outputs:
+    default:
+        title: Default output
+        type: '@facets/dns-zone'
+sample:
+    disabled: true
+    flavor: aws
+    kind: dns_zone
+    spec: {}
+    version: "1.0"
+spec:
+    properties:
+        domain_name:
+            description: Root domain (e.g. example.com)
+            title: Domain Name
+            type: string
+    required:
+        - domain_name
+    type: object
+version: "1.0"
