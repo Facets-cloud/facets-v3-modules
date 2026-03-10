@@ -1,0 +1,48 @@
+clouds:
+    - aws
+description: Shared Application Load Balancer
+flavor: aws
+inputs:
+    cloud_account:
+        displayName: cloud_account
+        providers:
+            - aws
+        type: '@facets/aws_cloud_account'
+    dns_zone:
+        description: Route 53 hosted zone for cert validation and DNS record
+        displayName: DNS Zone
+        optional: true
+        type: '@facets/dns-zone'
+    network_details:
+        displayName: network_details
+        type: '@facets/aws-vpc-details'
+intent: alb
+outputs:
+    default:
+        title: Default output
+        type: '@facets/alb'
+sample:
+    disabled: false
+    flavor: aws
+    kind: alb
+    spec:
+        idle_timeout: 60
+        internal: false
+    version: "1.0"
+spec:
+    properties:
+        idle_timeout:
+            default: 60
+            title: Idle Timeout (seconds)
+            type: integer
+        internal:
+            default: false
+            title: Internal ALB
+            type: boolean
+        subdomain_prefix:
+            description: 'Override env-based subdomain (default: environment name)'
+            title: Subdomain Prefix
+            type: string
+    required: []
+    type: object
+version: "1.0"
