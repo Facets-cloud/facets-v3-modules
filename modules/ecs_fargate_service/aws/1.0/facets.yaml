@@ -1,0 +1,134 @@
+clouds:
+    - aws
+description: ECS Fargate service with ALB — no Kubernetes cluster required
+flavor: aws
+inputs:
+    alb:
+        description: Shared ALB for routing traffic to this service
+        displayName: Application Load Balancer
+        optional: false
+        type: '@facets/alb'
+    cloud_account:
+        description: AWS credentials for deployment
+        displayName: Cloud Account
+        optional: false
+        providers:
+            - aws
+        type: '@facets/aws_cloud_account'
+    network_details:
+        description: VPC with public/private subnets for ALB and tasks
+        displayName: Network
+        optional: false
+        type: '@facets/aws-vpc-details'
+intent: ecs_fargate_service
+outputs:
+    default:
+        title: ECS Fargate Service Details
+        type: '@facets/ecs-fargate-service'
+sample:
+    disabled: false
+    flavor: aws
+    kind: ecs_fargate_service
+    spec:
+        container_image: nginx:latest
+        container_port: 80
+        cpu: 256
+        desired_count: 1
+        env: {}
+        health_check_path: /
+        memory: 512
+    version: "1.0"
+spec:
+    properties:
+        assign_public_ip:
+            default: true
+            description: Whether tasks get a public IP (required if no NAT gateway)
+            title: Assign Public IP
+            type: boolean
+        container_image:
+            description: Docker image URI (e.g. 123456789.dkr.ecr.us-east-1.amazonaws.com/app:latest)
+            title: Container Image
+            type: string
+        container_port:
+            default: 3000
+            maximum: 65535
+            minimum: 1
+            title: Container Port
+            type: integer
+        cpu:
+            default: 256
+            enum:
+                - 256
+                - 512
+                - 1024
+                - 2048
+                - 4096
+            title: CPU (units)
+            type: integer
+        desired_count:
+            default: 1
+            maximum: 10
+            minimum: 0
+            title: Desired Task Count
+            type: integer
+        env:
+            description: Key-value map of environment variables
+            title: Environment Variables
+            type: object
+        health_check_path:
+            default: /healthz
+            title: Health Check Path
+            type: string
+        iam_statements:
+            description: IAM statements attached to the task role for AWS service access
+            items:
+                properties:
+                    actions:
+                        items:
+                            type: string
+                        type: array
+                    effect:
+                        default: Allow
+                        enum:
+                            - Allow
+                            - Deny
+                        type: string
+                    resources:
+                        items:
+                            type: string
+                        type: array
+                required:
+                    - actions
+                    - resources
+                type: object
+            title: IAM Policy Statements
+            type: array
+        memory:
+            default: 512
+            enum:
+                - 512
+                - 1024
+                - 2048
+                - 4096
+                - 8192
+                - 16384
+                - 30720
+            title: Memory (MiB)
+            type: integer
+        path_pattern:
+            default: /*
+            description: URL path pattern for ALB listener rule routing (e.g. /api/*)
+            title: Path Pattern
+            type: string
+        priority:
+            default: 100
+            description: Priority for the ALB listener rule (lower = evaluated first)
+            maximum: 50000
+            minimum: 1
+            title: Listener Rule Priority
+            type: integer
+    required:
+        - container_image
+        - container_port
+    type: object
+version: "1.0"

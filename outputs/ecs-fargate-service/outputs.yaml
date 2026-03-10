@@ -1,0 +1,24 @@
+name: '@facets/ecs-fargate-service'
+properties:
+    properties:
+        attributes:
+            properties:
+                cluster_arn:
+                    type: string
+                log_group_name:
+                    type: string
+                security_group_id:
+                    type: string
+                service_arn:
+                    type: string
+                service_name:
+                    type: string
+                target_group_arn:
+                    type: string
+                task_definition_arn:
+                    type: string
+            type: object
+        interfaces:
+            type: object
+    type: object
+providers: []
