@@ -1,0 +1,20 @@
+name: '@facets/static-site'
+properties:
+    properties:
+        attributes:
+            properties:
+                bucket_arn:
+                    type: string
+                bucket_name:
+                    type: string
+                distribution_domain:
+                    type: string
+                distribution_id:
+                    type: string
+                fqdn:
+                    type: string
+            type: object
+        interfaces:
+            type: object
+    type: object
+providers: []

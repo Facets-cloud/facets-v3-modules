@@ -1,0 +1,58 @@
+clouds:
+    - aws
+description: S3 + CloudFront static site with optional custom domain
+flavor: aws
+inputs:
+    cloud_account:
+        displayName: cloud_account
+        providers:
+            - aws
+        type: '@facets/aws_cloud_account'
+    dns_zone:
+        description: Route 53 hosted zone for cert validation and DNS record
+        displayName: DNS Zone
+        optional: true
+        type: '@facets/dns-zone'
+intent: static_site
+outputs:
+    default:
+        title: Default output
+        type: '@facets/static-site'
+sample:
+    disabled: false
+    flavor: aws
+    kind: static_site
+    spec:
+        error_document: index.html
+        force_destroy: true
+        index_document: index.html
+        price_class: PriceClass_100
+    version: "1.0"
+spec:
+    properties:
+        error_document:
+            default: index.html
+            description: 'SPA-friendly: routes 403/404 to index.html for client-side routing'
+            title: Error Document
+            type: string
+        force_destroy:
+            default: true
+            description: Allow bucket deletion even when non-empty (useful for dev)
+            title: Force Destroy
+            type: boolean
+        index_document:
+            default: index.html
+            title: Index Document
+            type: string
+        price_class:
+            default: PriceClass_100
+            description: PriceClass_100 (NA+EU), PriceClass_200 (NA+EU+Asia), PriceClass_All
+            title: CloudFront Price Class
+            type: string
+        subdomain_prefix:
+            description: e.g. 'app' → app.pramod.dev
+            title: Subdomain Prefix
+            type: string
+    required: []
+    type: object
+version: "1.0"
