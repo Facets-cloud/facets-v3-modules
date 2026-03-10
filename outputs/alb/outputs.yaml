@@ -1,0 +1,20 @@
+name: '@facets/alb'
+properties:
+    properties:
+        attributes:
+            properties:
+                alb_arn:
+                    type: string
+                alb_dns_name:
+                    type: string
+                fqdn:
+                    type: string
+                listener_arn:
+                    type: string
+                security_group_id:
+                    type: string
+            type: object
+        interfaces:
+            type: object
+    type: object
+providers: []
