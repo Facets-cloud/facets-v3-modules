@@ -9,6 +9,7 @@ intentDetails:
   iconUrl: https://raw.githubusercontent.com/Facets-cloud/facets-modules-redesign/main/icons/cloud_account.svg
 clouds:
 - aws
+stateful: true
 spec:
   title: AWS Cloud Account
   description: Configure AWS provider authentication

@@ -6,6 +6,7 @@ clouds:
 - aws
 - gcp
 - azure
+stateful: true
 spec:
   title: Secret Store
   description: Key-value pairs (use !secret tag for encrypted values)

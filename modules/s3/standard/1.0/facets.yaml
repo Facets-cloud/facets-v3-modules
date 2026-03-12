@@ -9,6 +9,7 @@ intentDetails:
   iconUrl: https://raw.githubusercontent.com/Facets-cloud/facets-modules-redesign/main/icons/s3.svg
 clouds:
 - aws
+stateful: true
 inputs:
   cloud_account:
     type: '@facets/aws_cloud_account'

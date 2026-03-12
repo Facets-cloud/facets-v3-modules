@@ -3,6 +3,7 @@ flavor: aws-msk
 version: '1.0'
 clouds:
 - aws
+stateful: true
 description: AWS Managed Streaming for Apache Kafka cluster with secure defaults and
   automatic scaling
 intentDetails:

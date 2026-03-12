@@ -3,6 +3,7 @@ flavor: gcp-cloudsql
 version: '1.0'
 clouds:
 - gcp
+stateful: true
 description: Managed PostgreSQL database using Google Cloud SQL with secure defaults
   and high availability
 intentDetails:
