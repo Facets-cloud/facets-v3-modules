@@ -3,6 +3,7 @@ flavor: azure-flexible-server
 version: '1.0'
 clouds:
 - azure
+stateful: true
 description: A developer-friendly PostgreSQL flexible server with secure defaults
   and restore capabilities
 intentDetails:

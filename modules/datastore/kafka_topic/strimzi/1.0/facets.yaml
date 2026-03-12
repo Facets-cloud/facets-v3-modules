@@ -6,6 +6,7 @@ clouds:
 - azure
 - gcp
 - kubernetes
+stateful: true
 description: Kafka topics managed by Strimzi Topic Operator
 intentDetails:
   type: Datastores

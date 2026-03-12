@@ -3,6 +3,7 @@ flavor: gcp-msk
 version: '1.0'
 clouds:
 - gcp
+stateful: true
 description: Creates and manages topics for GCP Managed Service for Apache Kafka with
   configurable partitions, replication, and retention policies
 intentDetails:

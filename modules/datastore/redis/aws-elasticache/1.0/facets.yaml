@@ -3,6 +3,7 @@ flavor: aws-elasticache
 version: '1.0'
 clouds:
 - aws
+stateful: true
 description: Managed Redis cache using AWS ElastiCache with security and high availability
   defaults
 intentDetails:

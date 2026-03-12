@@ -3,6 +3,7 @@ flavor: aws-documentdb
 version: '1.0'
 clouds:
 - aws
+stateful: true
 description: MongoDB-compatible database using AWS DocumentDB service
 intentDetails:
   type: Datastores

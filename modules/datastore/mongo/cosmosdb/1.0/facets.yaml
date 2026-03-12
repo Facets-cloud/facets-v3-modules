@@ -3,6 +3,7 @@ flavor: cosmosdb
 version: '1.0'
 clouds:
 - azure
+stateful: true
 description: MongoDB-compatible database using Azure Cosmos DB service
 intentDetails:
   type: Datastores

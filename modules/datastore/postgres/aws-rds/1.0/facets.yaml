@@ -3,6 +3,7 @@ flavor: aws-rds
 version: '1.0'
 clouds:
 - aws
+stateful: true
 description: Managed PostgreSQL database using Amazon RDS with secure defaults and
   backup support
 intentDetails:

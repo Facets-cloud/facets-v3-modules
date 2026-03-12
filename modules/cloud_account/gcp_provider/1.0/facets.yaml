@@ -9,6 +9,7 @@ intentDetails:
   iconUrl: https://raw.githubusercontent.com/Facets-cloud/facets-modules-redesign/main/icons/cloud_account.svg
 clouds:
 - gcp
+stateful: true
 spec:
   title: GCP Cloud Account
   description: Configure GCP provider credentials. Uses gcloud auth application-default login if credentials fields are omitted.

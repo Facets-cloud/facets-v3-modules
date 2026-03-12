@@ -3,6 +3,7 @@ flavor: aws-aurora
 version: '1.0'
 clouds:
 - aws
+stateful: true
 description: A managed PostgreSQL Aurora cluster with high availability, automated
   backups, and read replicas
 intentDetails:

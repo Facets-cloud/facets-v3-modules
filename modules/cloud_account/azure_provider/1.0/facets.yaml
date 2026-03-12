@@ -9,6 +9,7 @@ intentDetails:
   iconUrl: https://raw.githubusercontent.com/Facets-cloud/facets-modules-redesign/main/icons/cloud_account.svg
 clouds:
 - azure
+stateful: true
 spec:
   title: Azure Cloud Account
   description: Configure Azure provider credentials. Uses az login defaults if service principal fields are omitted.

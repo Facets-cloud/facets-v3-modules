@@ -3,6 +3,7 @@ flavor: gcp-msk
 version: '1.0'
 clouds:
 - gcp
+stateful: true
 description: GCP Managed Service for Apache Kafka cluster with secure defaults and
   automatic scaling
 intentDetails:

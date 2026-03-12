@@ -6,6 +6,7 @@ clouds:
 - azure
 - gcp
 - kubernetes
+stateful: true
 description: Apache Kafka cluster deployed using Strimzi Kafka Operator with KRaft mode (no ZooKeeper)
 intentDetails:
   type: Datastores

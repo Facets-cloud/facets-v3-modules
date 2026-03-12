@@ -3,6 +3,7 @@ flavor: gcp-memorystore
 version: '1.0'
 clouds:
 - gcp
+stateful: true
 description: Managed Redis instance using Google Cloud Memorystore with high availability
   and security
 intentDetails:
